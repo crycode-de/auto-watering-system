@@ -8,5 +8,5 @@ before_script:
 
 job:
   stage: test
-  script: "platformio ci --project-conf platformio.ini --lib 'lib/dht22'"
+  script: "platformio ci --project-conf platformio.ini"
   variables: {PLATFORMIO_CI_SRC: "src"}
