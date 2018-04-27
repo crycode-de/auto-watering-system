@@ -21,6 +21,7 @@
 #define SENSORS_ACTIVE_PIN 10
 #define RH_TX_PIN          11
 #define RH_RX_PIN          12
+#define RH_PTT_PIN         17 // unused but needed
 #define LED_PIN            13
 #define DHT_PIN            14
 #define EEPROM_RESET_PIN   15

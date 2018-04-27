@@ -8,6 +8,8 @@
 #include "settings.h"
 #include "rh.h"
 
+bool adcOn = false;
+
 void loop () {
   unsigned long now = millis();
 
@@ -41,17 +43,21 @@ void loop () {
     dhtNextReadTime = now + ((uint32_t)settings.dhtInterval * 1000);
   }
 
+  // check if we need to turn on the adc and sensors 1 second before reading the adc values
+  // this is to give the sensors and the adc some time to reach a stable level
+  if (adcOn == false && checkTime(now, (adcNextReadTime - 1000))) {
+      // enable the adc
+      ADCSRA |= (1<<ADEN);
+
+      // enable the sensors
+      digitalWrite(SENSORS_ACTIVE_PIN, HIGH);
+
+      // set marker that the adc is on
+      adcOn = true;
+  }
+
   // check if we need to read the adc values
   if (checkTime(now, adcNextReadTime)) {
-    // enable the adc
-    ADCSRA |= (1<<ADEN);
-
-    // enable the sensors
-    digitalWrite(SENSORS_ACTIVE_PIN, HIGH);
-
-    // short delay before reading
-    delay(10);
-
     // read adc values and check if we need to turn on some channels
     for (uint8_t chan = 0; chan < 4; chan++) {
       if (settings.channelEnabled[chan]) {
@@ -99,6 +105,9 @@ void loop () {
 
     // disable the adc
     ADCSRA &= ~(1<<ADEN);
+
+    // set marker that the adc is off
+    adcOn = false;
 
     // calc next adc read time
     adcNextReadTime = now + ((uint32_t)settings.checkInterval * 1000);
