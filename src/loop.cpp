@@ -38,13 +38,19 @@ void loop () {
     }
 
     // calc next dht read time
-    dhtNextReadTime = now + (settings.dhtInterval * 1000);
+    dhtNextReadTime = now + ((uint32_t)settings.dhtInterval * 1000);
   }
 
   // check if we need to read the adc values
   if (checkTime(now, adcNextReadTime)) {
     // enable the adc
     ADCSRA |= (1<<ADEN);
+
+    // enable the sensors
+    digitalWrite(SENSORS_ACTIVE_PIN, HIGH);
+
+    // short delay before reading
+    delay(10);
 
     // read adc values and check if we need to turn on some channels
     for (uint8_t chan = 0; chan < 4; chan++) {
@@ -72,9 +78,19 @@ void loop () {
       rhSend(RH_MSG_SENSOR_VALUES, 9);
     }
 
+    // disable the sensors
+    digitalWrite(SENSORS_ACTIVE_PIN, LOW);
+
     // read battery voltage
     uint16_t batRaw = analogRead(BATTERY_ADC);
-    uint8_t batPercent = 100 * (batRaw - BAT_ADC_LOW) / (BAT_ADC_FULL - BAT_ADC_LOW);
+    uint8_t batPercent;
+    if (batRaw <= BAT_ADC_LOW) {
+      batPercent = 0;
+    } else if (batRaw >= BAT_ADC_FULL) {
+      batPercent = 100;
+    } else {
+      batPercent = 100 * (batRaw - BAT_ADC_LOW) / (BAT_ADC_FULL - BAT_ADC_LOW);
+    }
 
     // send RadioHead message
     rhBufTx[1] = batPercent;
@@ -85,7 +101,7 @@ void loop () {
     ADCSRA &= ~(1<<ADEN);
 
     // calc next adc read time
-    adcNextReadTime = now + (settings.checkInterval * 1000);
+    adcNextReadTime = now + ((uint32_t)settings.checkInterval * 1000);
   }
 
   for (uint8_t chan = 0; chan < 4; chan++) {
@@ -98,7 +114,7 @@ void loop () {
       else if (channelOn[chan] == false && channelTurnOn[chan] == true) {
         if (turnValveOn(chan)) {
           // calc the turn off time
-          channelTurnOffTime[chan] = now + (settings.wateringTime[chan] * 1000);
+          channelTurnOffTime[chan] = now + ((uint32_t)settings.wateringTime[chan] * 1000);
           // reset the turn on indecator
           channelTurnOn[chan] = false;
         }

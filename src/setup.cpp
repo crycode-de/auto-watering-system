@@ -12,13 +12,6 @@
 
 void setup () {
 
-  // all channels are off while starting
-  for (uint8_t chan = 0; chan < 4; chan++) {
-    channelOn[chan] = false;
-    channelTurnOn[chan] = false;
-    channelTurnOffTime[chan] = 0;
-  }
-
   // setup the pins
   pinMode(VALVE_0_PIN, OUTPUT);
   pinMode(VALVE_1_PIN, OUTPUT);
@@ -31,6 +24,15 @@ void setup () {
   pinMode(SENSORS_ACTIVE_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
   pinMode(EEPROM_RESET_PIN, INPUT_PULLUP);
+
+  // all channels are off while starting
+  for (uint8_t chan = 0; chan < 4; chan++) {
+    channelOn[chan] = false;
+    channelTurnOn[chan] = false;
+    channelTurnOffTime[chan] = 0;
+    digitalWrite(valvePins[chan], LOW);
+  }
+  digitalWrite(SENSORS_ACTIVE_PIN, LOW);
 
   // enable PCINT for the buttons
   attachPCINT(digitalPinToPCINT(VALVE_0_BUTTON_PIN), handlePcintButton0, FALLING);
