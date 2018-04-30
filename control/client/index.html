@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US" >
+  <head>
+    <meta charset="utf-8">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <base href="/">
+    <title>Automatic Watering System Control</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="connectDialog">
+      <div>
+        Port: <input type="text" id="iPort" placeholder="Serialport" />
+        <select id="portSelect">
+          <option selected value="">Choose port...</option>
+        </select>
+      </div>
+      <div>
+        Baudrate: <input type="text" id="iBaud" placeholder="Baudrate" value="9600" />
+      </div>
+      <div>
+        This node: <input type="text" id="iAddressServer" placeholder="" value="0x01" />
+        Watering system: <input type="text" id="iAddressClient" placeholder="" value="0xDC" />
+      </div>
+      <div>
+        <button id="connectButton">Connect ...</button>
+      </div>
+    </div>
+
+    <div id="settingsDialog">
+      <div>
+        <button id="checkNowButton">Check now</button>
+        <button id="getSettingsButton">Get settings from watering system</button>
+      </div>
+      <div id="settings">
+        <div>
+          Channels active:
+          <input type="checkbox" id="channelEnabled0" /> 0 &nbsp;
+          <input type="checkbox" id="channelEnabled1" /> 1 &nbsp;
+          <input type="checkbox" id="channelEnabled2" /> 2 &nbsp;
+          <input type="checkbox" id="channelEnabled3" /> 3 &nbsp;
+        </div>
+        <div>
+          ADC trigger values:
+          <input type="number" id="adcTriggerValue0" /> &nbsp;
+          <input type="number" id="adcTriggerValue1" /> &nbsp;
+          <input type="number" id="adcTriggerValue2" /> &nbsp;
+          <input type="number" id="adcTriggerValue3" /> &nbsp;
+        </div>
+        <div>
+          Watering times in seconds:
+          <input type="number" id="wateringTime0" /> &nbsp;
+          <input type="number" id="wateringTime1" /> &nbsp;
+          <input type="number" id="wateringTime2" /> &nbsp;
+          <input type="number" id="wateringTime3" /> &nbsp;
+        </div>
+        <div>
+          Check interval:
+          <input type="number" id="checkInterval" /> seconds
+        </div>
+        <div>
+          DHT interval:
+          <input type="number" id="dhtInterval" /> seconds
+        </div>
+        <div>
+          Send adc values through RadioHead:
+          <input type="checkbox" id="sendAdcValuesThroughRH" /> seconds
+        </div>
+        <div>
+          <button id="setSettingsButton">Send settings to watering system</button>
+          <button id="saveSettingsButton">Save current settings on watering system to EEPROM</button>
+        </div>
+      </div>
+    </div>
+
+    <pre id="log"></pre>
+    <script src="client.js" type="text/javascript"></script>
+  </body>
+</html>
