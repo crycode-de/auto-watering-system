@@ -48,6 +48,8 @@ extern unsigned long dhtNextReadTime;
 
 extern volatile bool channelOn[4];
 
+extern bool pauseAutomatic;
+
 extern dht dhtSensor;
 
 #endif

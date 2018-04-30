@@ -18,6 +18,8 @@
 #define RH_MSG_CHECK_NOW        0x60
 #define RH_MSG_TURN_CHANNEL_ON  0x61
 #define RH_MSG_TURN_CHANNEL_OFF 0x62
+#define RH_MSG_PAUSE            0x63
+#define RH_MSG_RESUME           0x64
 
 // buffer for RadioHead messages
 // rhBufTx[0] - control byte

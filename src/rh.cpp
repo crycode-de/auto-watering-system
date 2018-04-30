@@ -112,6 +112,16 @@ void rhRecv () {
           // set the turn off time for channel to now
           channelTurnOffTime[rhBufRx[1]] = millis();
           break;
+
+        case RH_MSG_PAUSE:
+          // enable pause
+          pauseAutomatic = true;
+          break;
+
+        case RH_MSG_RESUME:
+          // resume from pause
+          pauseAutomatic = false;
+          break;
       }
     }
   }

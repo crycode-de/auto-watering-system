@@ -33,6 +33,7 @@ void setup () {
     digitalWrite(valvePins[chan], LOW);
   }
   digitalWrite(SENSORS_ACTIVE_PIN, LOW);
+  pauseAutomatic = false;
 
   // enable PCINT for the buttons
   attachPCINT(digitalPinToPCINT(VALVE_0_BUTTON_PIN), handlePcintButton0, FALLING);

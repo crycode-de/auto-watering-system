@@ -14,4 +14,6 @@ unsigned long dhtNextReadTime;
 
 volatile bool channelOn[4];
 
+bool pauseAutomatic;
+
 dht dhtSensor;

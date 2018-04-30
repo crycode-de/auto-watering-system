@@ -58,30 +58,33 @@ void loop () {
 
   // check if we need to read the adc values
   if (checkTime(now, adcNextReadTime)) {
-    // read adc values and check if we need to turn on some channels
-    for (uint8_t chan = 0; chan < 4; chan++) {
-      if (settings.channelEnabled[chan]) {
-        // read the adc value of the channel
-        uint16_t adcVal = analogRead(sensorAdcPins[chan]);
-        // check trigger value
-        if (adcVal >= settings.adcTriggerValue[chan]) {
-          // set marker to turn the channel on
-          channelTurnOn[chan] = true;
+    // only read sensors if not pause
+    if (!pauseAutomatic) {
+      // read adc values and check if we need to turn on some channels
+      for (uint8_t chan = 0; chan < 4; chan++) {
+        if (settings.channelEnabled[chan]) {
+          // read the adc value of the channel
+          uint16_t adcVal = analogRead(sensorAdcPins[chan]);
+          // check trigger value
+          if (adcVal >= settings.adcTriggerValue[chan]) {
+            // set marker to turn the channel on
+            channelTurnOn[chan] = true;
+          }
+          // save for RadioHead
+          if (settings.sendAdcValuesThroughRH) {
+            memcpy(&rhBufTx[1+chan*2], &adcVal, 2);
+          }
+        } else if (settings.sendAdcValuesThroughRH) {
+          // if channel is disabled but sending adc values is enabled set the value in buffer to 0x0000
+          rhBufTx[1+chan*2] = 0x00;
+          rhBufTx[2+chan*2] = 0x00;
         }
-        // save for RadioHead
-        if (settings.sendAdcValuesThroughRH) {
-          memcpy(&rhBufTx[1+chan*2], &adcVal, 2);
-        }
-      } else if (settings.sendAdcValuesThroughRH) {
-        // if channel is disabled but sending adc values is enabled set the value in buffer to 0x0000
-        rhBufTx[1+chan*2] = 0x00;
-        rhBufTx[2+chan*2] = 0x00;
       }
-    }
-    // send adc sensor values through RadioHead
-    if (settings.sendAdcValuesThroughRH) {
-      // send RadioHead message
-      rhSend(RH_MSG_SENSOR_VALUES, 9);
+      // send adc sensor values through RadioHead
+      if (settings.sendAdcValuesThroughRH) {
+        // send RadioHead message
+        rhSend(RH_MSG_SENSOR_VALUES, 9);
+      }
     }
 
     // disable the sensors
