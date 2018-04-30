@@ -88,6 +88,7 @@ void setup () {
 
 
   // calc adc and dht next read time, 5/10 seconds from now
+  // dht read is 5 seconds before adc read to avoid both readings at the same time
   dhtNextReadTime = millis() + 5000;
   adcNextReadTime = millis() + 10000;
 

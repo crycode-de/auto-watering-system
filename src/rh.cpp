@@ -83,6 +83,11 @@ void rhRecv () {
           settings.sendAdcValuesThroughRH = ((rhBufRx[1] & (1 << 7)) != 0);
           memcpy(&settings.checkInterval, &rhBufRx[18], 2);
           memcpy(&settings.dhtInterval, &rhBufRx[20], 2);
+
+          // calc new read times
+          // dht read is 5 seconds before adc read to avoid both readings at the same time
+          dhtNextReadTime = millis() - 5000 + ((uint32_t)settings.dhtInterval * 1000);
+          adcNextReadTime = millis() + ((uint32_t)settings.checkInterval * 1000);
           break;
 
         case RH_MSG_SAVE_SETTINGS:
