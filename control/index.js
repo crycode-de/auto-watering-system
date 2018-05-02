@@ -59,6 +59,8 @@ class Watering {
     this.apiGetSettings = this.apiGetSettings.bind(this);
     this.apiSetSettings = this.apiSetSettings.bind(this);
     this.apiSaveSettings = this.apiSaveSettings.bind(this);
+    this.apiPause = this.apiPause.bind(this);
+    this.apiResume = this.apiResume.bind(this);
     this.apiOnoff = this.apiOnoff.bind(this);
     this.log = this.log.bind(this);
     this.rhsSend = this.rhsSend.bind(this);
@@ -82,6 +84,8 @@ class Watering {
     this.app.get('/api/getPorts', this.apiGetPorts);
     this.app.get('/api/getSettings', this.apiGetSettings);
     this.app.get('/api/saveSettings', this.apiSaveSettings);
+    this.app.get('/api/pause', this.apiPause);
+    this.app.get('/api/resume', this.apiResume);
     this.app.post('/api/connect', this.apiConnect);
     this.app.post('/api/onoff', this.apiOnoff);
     this.app.post('/api/setSettings', this.apiSetSettings);
@@ -239,6 +243,28 @@ class Watering {
     let buf = Buffer.alloc(2);
     buf[0] = req.body.on ? RH_MSG_TURN_CHANNEL_ON : RH_MSG_TURN_CHANNEL_OFF;
     buf[1] = parseInt(req.body.channel, 10) || 0;
+    this.rhsSend(buf);
+
+    res.send('Ok');
+  }
+
+  /**
+   * API endpoint for sending a 'pause' command to the watering system.
+   */
+  apiPause (req, res, next) {
+    let buf = Buffer.alloc(1);
+    buf[0] = RH_MSG_PAUSE;
+    this.rhsSend(buf);
+
+    res.send('Ok');
+  }
+
+  /**
+   * API endpoint for sending a 'resume' command to the watering system.
+   */
+  apiResume (req, res, next) {
+    let buf = Buffer.alloc(1);
+    buf[0] = RH_MSG_RESUME;
     this.rhsSend(buf);
 
     res.send('Ok');

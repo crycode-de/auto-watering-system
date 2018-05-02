@@ -20,6 +20,8 @@ class WateringClient {
     for (let i = 0; i < 4; i++) {
       document.getElementById('onoff' + i).onclick = this.apiOnoff.bind(this);
     }
+    document.getElementById('pause').onclick = this.apiPause;
+    document.getElementById('resume').onclick = this.apiResume;
 
     this.apiGetInfo = this.apiGetInfo.bind(this);
 
@@ -195,6 +197,10 @@ class WateringClient {
     });
   }
 
+  /**
+   * Method to turn a channel on/off.
+   * Called by pressing a button.
+   */
   apiOnoff (event) {
     let data = {
       channel: event.target.dataset.chan || 0,
@@ -211,6 +217,30 @@ class WateringClient {
       },
       method: 'POST'
     })
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
+   * Method to send the 'pause' command to the watering system.
+   */
+  apiPause () {
+    fetch('/api/pause')
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
+   * Method to send the 'resume' command to the watering system.
+   */
+  apiResume () {
+    fetch('/api/resume')
     .then((res) => {
       if (res.status != 200) {
         alert('Error! ' + res.status + '\n' + res.body);
