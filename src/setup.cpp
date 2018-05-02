@@ -1,4 +1,8 @@
 /*
+ * Automatic Watering System
+ *
+ * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ *
  * The Arduino setup function which is called once on startup.
  */
 

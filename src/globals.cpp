@@ -1,4 +1,8 @@
 /*
+ * Automatic Watering System
+ *
+ * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ *
  * Global definition of some variables/constants.
  */
 

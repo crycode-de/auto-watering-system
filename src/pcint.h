@@ -1,3 +1,8 @@
+/*
+ * Automatic Watering System
+ *
+ * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ */
 #ifndef __PCINT_H__
 #define __PCINT_H__
 

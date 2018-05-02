@@ -1,4 +1,8 @@
 /*
+ * Automatic Watering System
+ *
+ * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ *
  * The Arduino loop function which is called in a infinite loop.
  */
 
