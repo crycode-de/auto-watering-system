@@ -1,75 +1,151 @@
 <!DOCTYPE html>
+<!--
+* Automatic Watering System Control App
+*
+* Frontend
+*
+* (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+-->
 <html lang="en-US" >
   <head>
     <meta charset="utf-8">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <base href="/">
     <title>Automatic Watering System Control</title>
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <link href="style.css" rel="stylesheet">
   </head>
   <body>
+    <div id="fetchError" style="display:none;">Error while getting data from backend!</div>
     <div id="connectDialog">
-      <div>
-        Port: <input type="text" id="iPort" placeholder="Serialport" />
-        <select id="portSelect">
-          <option selected value="">Choose port...</option>
-        </select>
-      </div>
-      <div>
-        Baudrate: <input type="text" id="iBaud" placeholder="Baudrate" value="9600" />
-      </div>
-      <div>
-        This node: <input type="text" id="iAddressServer" placeholder="" value="0x01" />
-        Watering system: <input type="text" id="iAddressClient" placeholder="" value="0xDC" />
+      <div class="table">
+        <div class="row">
+          <div class="cell">Port</div>
+          <div class="cell">
+            <input type="text" id="port" placeholder="Serialport" required />
+          </div>
+          <div class="cell">
+            <select id="portSelect">
+              <option selected value="">Choose port...</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="cell">Baudrate</div>
+          <div class="cell">
+            <input type="number" id="baud" placeholder="Baudrate" value="9600" required />
+          </div>
+        </div>
+        <div class="row">
+          <div class="cell">Address of this node</div>
+          <div class="cell">
+            <input type="text" id="addressServer" placeholder="0x01 or 1" value="0x01" required />
+          </div>
+        </div>
+        <div class="row">
+          <div class="cell">Address of the watering system</div>
+          <div class="cell">
+            <input type="text" id="addressClient" placeholder="0xDC or 220" value="0xDC" required />
+          </div>
+        </div>
       </div>
       <div>
         <button id="connectButton">Connect ...</button>
       </div>
     </div>
 
-    <div id="settingsDialog">
+    <div id="settingsDialog" style="display:none;">
       <div>
         <button id="checkNowButton">Check now</button>
         <button id="getSettingsButton">Get settings from watering system</button>
       </div>
       <div id="settings">
-        <div>
-          Channels active:
-          <input type="checkbox" id="channelEnabled0" /> 0 &nbsp;
-          <input type="checkbox" id="channelEnabled1" /> 1 &nbsp;
-          <input type="checkbox" id="channelEnabled2" /> 2 &nbsp;
-          <input type="checkbox" id="channelEnabled3" /> 3 &nbsp;
-        </div>
-        <div>
-          ADC trigger values:
-          <input type="number" id="adcTriggerValue0" /> &nbsp;
-          <input type="number" id="adcTriggerValue1" /> &nbsp;
-          <input type="number" id="adcTriggerValue2" /> &nbsp;
-          <input type="number" id="adcTriggerValue3" /> &nbsp;
-        </div>
-        <div>
-          Watering times in seconds:
-          <input type="number" id="wateringTime0" /> &nbsp;
-          <input type="number" id="wateringTime1" /> &nbsp;
-          <input type="number" id="wateringTime2" /> &nbsp;
-          <input type="number" id="wateringTime3" /> &nbsp;
-        </div>
-        <div>
-          Check interval:
-          <input type="number" id="checkInterval" /> seconds
-        </div>
-        <div>
-          DHT interval:
-          <input type="number" id="dhtInterval" /> seconds
-        </div>
-        <div>
-          Send adc values through RadioHead:
-          <input type="checkbox" id="sendAdcValuesThroughRH" /> seconds
+        <div class="table">
+          <div class="row">
+            <div class="cell">&nbsp;</div>
+            <div class="cell center">Channel 0</div>
+            <div class="cell center">Channel 1</div>
+            <div class="cell center">Channel 2</div>
+            <div class="cell center">Channel 3</div>
+          </div>
+            <div class="row">
+              <div class="cell">Active</div>
+              <div class="cell"><input type="checkbox" id="channelEnabled0" /></div>
+              <div class="cell"><input type="checkbox" id="channelEnabled1" /></div>
+              <div class="cell"><input type="checkbox" id="channelEnabled2" /></div>
+              <div class="cell"><input type="checkbox" id="channelEnabled3" /></div>
+            </div>
+            <div class="row">
+              <div class="cell">ADC tigger values</div>
+              <div class="cell"><input type="number" id="adcTriggerValue0" min="0" max="1023" required /></div>
+              <div class="cell"><input type="number" id="adcTriggerValue1" min="0" max="1023" required /></div>
+              <div class="cell"><input type="number" id="adcTriggerValue2" min="0" max="1023" required /></div>
+              <div class="cell"><input type="number" id="adcTriggerValue3" min="0" max="1023" required /></div>
+            </div>
+            <div class="row">
+              <div class="cell">Watering times</div>
+              <div class="cell"><input type="number" id="wateringTime0" min="1" max="65535" required /></div>
+              <div class="cell"><input type="number" id="wateringTime1" min="1" max="65535" required /></div>
+              <div class="cell"><input type="number" id="wateringTime2" min="1" max="65535" required /></div>
+              <div class="cell"><input type="number" id="wateringTime3" min="1" max="65535" required /></div>
+            </div>
+            <div class="row">&nbsp;</div>
+            <div class="row">
+              <div class="cell">Check interval</div>
+              <div class="cell"><input type="number" id="checkInterval" min="1" max="65535" required /></div>
+              <div class="cell">seconds</div>
+            </div>
+            <div class="row">
+              <div class="cell">DHT interval</div>
+              <div class="cell"><input type="number" id="dhtInterval" min="1" max="65535" required /></div>
+              <div class="cell">seconds</div>
+            </div>
+            <div class="row">
+              <div class="cell">Send adc values</div>
+              <div class="cell"><input type="checkbox" id="sendAdcValuesThroughRH" /></div>
+            </div>
         </div>
         <div>
           <button id="setSettingsButton">Send settings to watering system</button>
           <button id="saveSettingsButton">Save current settings on watering system to EEPROM</button>
+        </div>
+      </div>
+
+      <div id="status">
+        <div class="table">
+          <div class="row">
+            <div class="cell">&nbsp;</div>
+            <div class="cell center">Channel 0</div>
+            <div class="cell center">Channel 1</div>
+            <div class="cell center">Channel 2</div>
+            <div class="cell center">Channel 3</div>
+          </div>
+            <div class="row">
+              <div class="cell">Status</div>
+              <div class="cell center"><button id="onoff0" title="toggle" data-chan="0"></button></div>
+              <div class="cell center"><button id="onoff1" title="toggle" data-chan="1"></button></div>
+              <div class="cell center"><button id="onoff2" title="toggle" data-chan="2"></button></div>
+              <div class="cell center"><button id="onoff3" title="toggle" data-chan="3"></button></div>
+            </div>
+          </div>
+            <div class="row">
+              <div class="cell">Values</div>
+              <div class="cell center" id="value0"></div>
+              <div class="cell center" id="value1"></div>
+              <div class="cell center" id="value2"></div>
+              <div class="cell center" id="value3"></div>
+            </div>
+            <div class="row">&nbsp;</div>
+            <div class="row">
+              <div class="cell">DHT</div>
+              <div class="cell center" id="temperature"></div>
+              <div class="cell center" id="humidity"></div>
+            </div>
+            <div class="row">
+              <div class="cell">Battery</div>
+              <div class="cell center" id="battery"></div>
+              <div class="cell center" id="battery2"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

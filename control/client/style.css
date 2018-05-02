@@ -1,0 +1,68 @@
+/*
+ * Automatic Watering System Control App
+ *
+ * Frontend styles
+ *
+ * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ */
+
+#fetchError {
+  background-color: #FDD;
+  color: #A00;
+  font-weight: bold;
+  padding: 20px;
+}
+
+#settingsDialog > div, #connectDialog > div {
+  padding: 15px;
+}
+
+.table {
+  display: table;
+}
+
+.row {
+  display: table-row;
+}
+
+.cell {
+  display: table-cell;
+  padding: 3px;
+  min-width: 100px;
+}
+
+.cell:first-child {
+  min-width: 150px;
+}
+
+.cell.center {
+  text-align: center;
+}
+
+.cell input, .cell button {
+  width: 80px;
+}
+
+#port {
+  width: 150px;
+}
+
+input, select, button {
+  background-color: #EEFFFF;
+  border: 1px solid #888;
+  padding: 5px;
+}
+
+input:hover, select:hover, button:hover {
+  background-color: #BBFFFF;
+}
+
+input:focus, select:focus, button:focus {
+  background-color: #CCFFFF;
+}
+
+.on {
+  background-color: #DFD;
+  color: #0A0;
+  font-weight: bold;
+}

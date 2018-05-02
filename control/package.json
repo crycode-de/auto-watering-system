@@ -1,16 +1,26 @@
 {
   "name": "auto-watering-control",
   "version": "1.0.0",
-  "description": "",
+  "description": "Control tool for the automatic watering system",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Peter Müller <peter@crycode.de>",
+  "author": "Peter Müller <peter@crycode.de> (https://crycode.de/)",
   "license": "GPL-2.0",
+  "homepage": "https://git.cryhost.de/crycode/auto-watering",
+  "repository": {
+    "type": "git",
+    "url": "https://git.cryhost.de/crycode/auto-watering.git"
+  },
+  "bugs": {
+    "url": "https://git.cryhost.de/crycode/auto-watering/issues"
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "radiohead-serial": "^3.1.0"
-  }
+  },
+  "private": true
 }
