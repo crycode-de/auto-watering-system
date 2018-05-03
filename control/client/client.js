@@ -10,6 +10,7 @@
 class WateringClient {
   constructor () {
     document.getElementById('checkNowButton').onclick = this.apiCheckNow;
+    document.getElementById('pingButton').onclick = this.apiPing;
     document.getElementById('connectButton').onclick = this.apiConnect;
     document.getElementById('getSettingsButton').onclick = this.apiGetSettings;
     document.getElementById('setSettingsButton').onclick = this.apiSetSettings;
@@ -26,6 +27,7 @@ class WateringClient {
     this.apiGetInfo = this.apiGetInfo.bind(this);
 
     this.settingsTime = 0;
+    this.softwareVersion = null;
     this.logCount = 0;
     this.info = null;
 
@@ -90,6 +92,11 @@ class WateringClient {
       document.getElementById('battery').innerHTML = info.status.batPercent + ' %';
       document.getElementById('battery2').innerHTML = info.status.batVolt + ' V (' + info.status.batRaw + ')';
 
+      if (this.softwareVersion != info.softwareVersion) {
+        document.getElementById('softwareVersion').innerHTML = info.softwareVersion;
+        this.softwareVersion = info.softwareVersion;
+      }
+
       if (this.logCount != info.log.length) {
         document.getElementById('log').innerHTML = info.log.map((l) => { return l.time + ' ' + l.text }).reverse().join('\n');
         this.logCount = info.log.length;
@@ -126,6 +133,18 @@ class WateringClient {
    */
   apiCheckNow () {
     fetch('/api/checkNow')
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
+   * Method to send the 'ping' command to the watering system.
+   */
+  apiPing () {
+    fetch('/api/ping')
     .then((res) => {
       if (res.status != 200) {
         alert('Error! ' + res.status + '\n' + res.body);

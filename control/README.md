@@ -32,10 +32,12 @@ On the Website you have to configure your connection first.
 
 Once you are connected to the serial-radio gateway you can:
 * Interact with the watering system
-* See all the received information (adc and DHT values, battery status, turned on channel)
+* See all the received information (adc and DHT values, battery status, turned on channels)
 * Turn on or off a channel
 * Read the current settings from the watering system
 * Send new settings to the watering system
+* See the software version of the watering system
+* Send pings and receive pongs
 
 
 ## Known issues

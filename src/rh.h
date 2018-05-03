@@ -26,10 +26,15 @@
 #define RH_MSG_PAUSE            0x63
 #define RH_MSG_RESUME           0x64
 
+#define RH_MSG_GET_VERSION      0xF0
+#define RH_MSG_VERSION          0xF1
+#define RH_MSG_PING             0xF2
+#define RH_MSG_PONG             0xF3
+
 // buffer for RadioHead messages
-// rhBufTx[0] - control byte
-#define RH_BUF_TX_LEN 22 // TODO change to max need length
-#define RH_BUF_RX_LEN 22 // TODO change to max need length
+// rhBuf?x[0] - message type
+#define RH_BUF_TX_LEN 22
+#define RH_BUF_RX_LEN 22
 extern uint8_t rhBufTx[RH_BUF_TX_LEN];
 extern uint8_t rhBufRx[RH_BUF_RX_LEN];
 

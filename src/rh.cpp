@@ -131,6 +131,22 @@ void rhRecv () {
           // resume from pause
           pauseAutomatic = false;
           break;
+
+        case RH_MSG_GET_VERSION:
+          // send the software version
+          rhBufTx[1] = SOFTWARE_VERSION_MAJOR;
+          rhBufTx[2] = SOFTWARE_VERSION_MINOR;
+          rhBufTx[3] = SOFTWARE_VERSION_PATCH;
+          rhSend(RH_MSG_VERSION, 4);
+          break;
+
+        case RH_MSG_PING:
+          // respond to a ping with the received data
+          for (uint8_t i = 1; i < rhRxLen; i++) {
+            rhBufTx[i] = rhBufRx[i];
+          }
+          rhSend(RH_MSG_PONG, rhRxLen);
+          break;
       }
     }
   }

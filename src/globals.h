@@ -13,6 +13,11 @@
 
 #include "config.h"
 
+// version number of the software
+#define SOFTWARE_VERSION_MAJOR 1
+#define SOFTWARE_VERSION_MINOR 0
+#define SOFTWARE_VERSION_PATCH 1
+
 // version of the eeporm data model; must be increased if the data model changes
 #define EEPROM_VERSION 1
 

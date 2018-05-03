@@ -33,6 +33,11 @@ const RH_MSG_TURN_CHANNEL_OFF = 0x62;
 const RH_MSG_PAUSE =            0x63;
 const RH_MSG_RESUME =           0x64;
 
+const RH_MSG_GET_VERSION =      0xF0;
+const RH_MSG_VERSION =          0xF1;
+const RH_MSG_PING =             0xF2;
+const RH_MSG_PONG =             0xF3;
+
 class Watering {
 
   constructor () {
@@ -50,10 +55,13 @@ class Watering {
       humidity: '-',
       on: [false, false, false, false]
     };
+    this.softwareVersion = '';
     this.logData = [];
+    this.lastPingData = Buffer.alloc(4);
 
     // bind own methods to 'this'
     this.apiCheckNow = this.apiCheckNow.bind(this);
+    this.apiPing = this.apiPing.bind(this);
     this.apiConnect = this.apiConnect.bind(this);
     this.apiGetInfo = this.apiGetInfo.bind(this);
     this.apiGetSettings = this.apiGetSettings.bind(this);
@@ -80,6 +88,7 @@ class Watering {
 
     // register API endpoints
     this.app.get('/api/checkNow', this.apiCheckNow);
+    this.app.get('/api/ping', this.apiPing);
     this.app.get('/api/getInfo', this.apiGetInfo);
     this.app.get('/api/getPorts', this.apiGetPorts);
     this.app.get('/api/getSettings', this.apiGetSettings);
@@ -105,7 +114,8 @@ class Watering {
       connected: this.connected,
       log: this.logData,
       settings: this.settings,
-      status: this.status
+      status: this.status,
+      softwareVersion: this.softwareVersion
     });
   }
 
@@ -155,11 +165,26 @@ class Watering {
 
     // init RadioHead
     this.rhs = new RadioHeadSerial(port, baud, addressServer);
+    this.rhs.setRetries(5);
     this.rhs.on('data', this.rhsReceived);
+
+    this.rhs.on('error', (err) => {
+      this.log('RHSerial error! ' + err.toString());
+    });
 
     this.connected = true;
 
-    this.log('connected');
+    this.log('connected to the serial-radio gateway');
+
+    // request the software version from the watering system
+    // use an interval to retry until we got a version
+    const getVersion = () => {
+      let buf = Buffer.alloc(1);
+      buf[0] = RH_MSG_GET_VERSION;
+      this.rhsSend(buf);
+    };
+    setTimeout(getVersion, 500);
+    this.versionInterval = setInterval(getVersion, 3000);
   }
 
   /**
@@ -168,6 +193,21 @@ class Watering {
   apiCheckNow (req, res, next) {
     let buf = Buffer.alloc(1);
     buf[0] = RH_MSG_CHECK_NOW;
+    this.rhsSend(buf);
+
+    res.send('Ok');
+  }
+
+  /**
+   * API endpoint for sending a 'ping' command with random data to the watering system.
+   */
+  apiPing (req, res, next) {
+    let buf = Buffer.alloc(5);
+    buf[0] = RH_MSG_PING;
+    for (let i = 1; i < 5; i++) {
+      buf[i] = Math.floor(Math.random()*255)
+    }
+    this.lastPingData = buf.slice(1);
     this.rhsSend(buf);
 
     res.send('Ok');
@@ -371,6 +411,21 @@ class Watering {
         this.settings.sendAdcValuesThroughRH = ((msg.data[1] & (1 << 7)) != 0);
         break;
 
+      case RH_MSG_VERSION:
+        clearInterval(this.versionInterval);
+        this.softwareVersion = `v${msg.data[1]}.${msg.data[2]}.${msg.data[3]}`;
+        this.log('Got software version ' + this.softwareVersion);
+        break;
+
+      case RH_MSG_PONG:
+        if (this.lastPingData.equals(msg.data.slice(1))) {
+          // correct data
+          this.log('Got pong with correct data :-)');
+        } else {
+          // wrong data
+          this.log('Got pong with wrong data :-(');
+        }
+        break;
     }
   }
 
