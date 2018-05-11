@@ -29,6 +29,9 @@ void setup () {
   pinMode(LED_PIN, OUTPUT);
   pinMode(EEPROM_RESET_PIN, INPUT_PULLUP);
 
+  // blink the LED to indecate starting
+  blinkCode(BLINK_LONG);
+
   // all channels are off while starting
   for (uint8_t chan = 0; chan < 4; chan++) {
     channelOn[chan] = false;
