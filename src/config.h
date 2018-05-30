@@ -38,12 +38,11 @@
 #define SENSOR_2_ADC   A6
 #define SENSOR_3_ADC   A7
 #define BATTERY_ADC    A2
-#define BRIGHTNESS_ADC A3
 
 /*
  * DHT temperature and humidity sensor
  */
-// Type of the used Sensor, 11 for DHT11, 12 for DHT12, 22 for DHT22
+// Type of the used Sensor, 11 for DHT11, 12 for DHT12, 22 for DHT22, 0 for no Sensor
 #define DHT_TYPE 22
 
 /*

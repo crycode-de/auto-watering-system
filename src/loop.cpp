@@ -17,35 +17,38 @@ bool adcOn = false;
 void loop () {
   unsigned long now = millis();
 
-  // check if we need to read from the dht sensor
-  if (checkTime(now, dhtNextReadTime)) {
-    // read from the sensor using the correct method for the sensor type
-    #if DHT_TYPE == 11
-      int dhtResult = dhtSensor.read11(DHT_PIN);
-    #elif DHT_TYPE == 12
-      int dhtResult = dhtSensor.read12(DHT_PIN);
-    #elif DHT_TYPE == 22
-      int dhtResult = dhtSensor.read22(DHT_PIN);
-    #else
-      #error DHT_TYPE must be 11, 12 or 22!
-    #endif
+  // DHT code only if DHT_TYPE is not zero
+  #if DHT_TYPE != 0
+    // check if we need to read from the dht sensor
+    if (checkTime(now, dhtNextReadTime)) {
+      // read from the sensor using the correct method for the sensor type
+      #if DHT_TYPE == 11
+        int dhtResult = dhtSensor.read11(DHT_PIN);
+      #elif DHT_TYPE == 12
+        int dhtResult = dhtSensor.read12(DHT_PIN);
+      #elif DHT_TYPE == 22
+        int dhtResult = dhtSensor.read22(DHT_PIN);
+      #else
+        #error DHT_TYPE must be 11, 12, 22 or 0!
+      #endif
 
-    // check the result
-    if (dhtResult == DHTLIB_OK) {
-      // sensor read ok
-      // send RadioHead message
-      memcpy(&rhBufTx[1], &dhtSensor.temperature, 4);
-      memcpy(&rhBufTx[5], &dhtSensor.humidity, 4);
-      rhSend(RH_MSG_DHTDATA, 9);
+      // check the result
+      if (dhtResult == DHTLIB_OK) {
+        // sensor read ok
+        // send RadioHead message
+        memcpy(&rhBufTx[1], &dhtSensor.temperature, 4);
+        memcpy(&rhBufTx[5], &dhtSensor.humidity, 4);
+        rhSend(RH_MSG_DHTDATA, 9);
 
-    } else {
-      // sensor read error
-      blinkCode(BLINK_CODE_DHT_ERROR);
+      } else {
+        // sensor read error
+        blinkCode(BLINK_CODE_DHT_ERROR);
+      }
+
+      // calc next dht read time
+      dhtNextReadTime = now + ((uint32_t)settings.dhtInterval * 1000);
     }
-
-    // calc next dht read time
-    dhtNextReadTime = now + ((uint32_t)settings.dhtInterval * 1000);
-  }
+  #endif
 
   // check if we need to turn on the adc and sensors 1 second before reading the adc values
   // this is to give the sensors and the adc some time to reach a stable level
