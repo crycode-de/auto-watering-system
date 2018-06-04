@@ -1,6 +1,6 @@
 {
   "name": "auto-watering-control",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Control tool for the automatic watering system",
   "main": "index.js",
   "scripts": {

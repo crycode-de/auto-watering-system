@@ -26,6 +26,11 @@ npm start
 
 Then open your browser and navigate to http://127.0.0.1:3000/.
 
+You may also set your own listen host and port using this:
+```
+HOST=0.0.0.0 PORT=1337 npm start
+```
+
 *Hint:* All communication is only on your localhost and through RadioHead. No data is send over the internet! :-)
 
 On the Website you have to configure your connection first.

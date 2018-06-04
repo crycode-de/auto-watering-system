@@ -100,7 +100,7 @@ class Watering {
     this.app.post('/api/setSettings', this.apiSetSettings);
 
     // let the server listen on the configured host and port
-    this.server.listen(3000, 'localhost', () => {
+    this.server.listen(process.env.PORT || 3000, process.env.HOST || '127.0.0.1', () => {
       const address = this.server.address();
       console.log(`Control app started!\n\nNow open http://${address.address}:${address.port}/ in your browser.\n`);
     });
