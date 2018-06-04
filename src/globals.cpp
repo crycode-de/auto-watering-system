@@ -20,4 +20,6 @@ volatile bool channelOn[4];
 
 bool pauseAutomatic;
 
-dht dhtSensor;
+#if DHT_TYPE != 0
+  dht dhtSensor;
+#endif

@@ -32,8 +32,10 @@ void loop () {
         #error DHT_TYPE must be 11, 12, 22 or 0!
       #endif
 
-      // check the result
-      if (dhtResult == DHTLIB_OK) {
+      // check the result and also if the values are plausible
+      if (dhtResult == DHTLIB_OK
+        && dhtSensor.humidity >= 0 && dhtSensor.humidity <= 100
+        && dhtSensor.temperature >= -50 && dhtSensor.temperature <= 100) {
         // sensor read ok
         // send RadioHead message
         memcpy(&rhBufTx[1], &dhtSensor.temperature, 4);

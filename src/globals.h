@@ -6,17 +6,19 @@
 #ifndef __GLOBALS_H__
 #define __GLOBALS_H__
 
+#include "config.h"
+
 #include <Arduino.h>
 #include <SPI.h>
-#include <dht.h>
+#if DHT_TYPE != 0
+  #include <dht.h>
+#endif
 #include <PinChangeInterrupt.h>
-
-#include "config.h"
 
 // version number of the software
 #define SOFTWARE_VERSION_MAJOR 1
 #define SOFTWARE_VERSION_MINOR 0
-#define SOFTWARE_VERSION_PATCH 2
+#define SOFTWARE_VERSION_PATCH 3
 
 // version of the eeporm data model; must be increased if the data model changes
 #define EEPROM_VERSION 1
@@ -60,6 +62,8 @@ extern volatile bool channelOn[4];
 
 extern bool pauseAutomatic;
 
-extern dht dhtSensor;
+#if DHT_TYPE != 0
+  extern dht dhtSensor;
+#endif
 
 #endif
