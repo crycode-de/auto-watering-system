@@ -5,6 +5,7 @@
  *
  * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
  */
+// jshint esversion:6, node:true
 'use strict';
 
 const SerialPort = require('serialport');
@@ -123,9 +124,10 @@ class Watering {
    * API endpoint for sending a list of available serial ports to the client.
    */
   apiGetPorts (req, res, next) {
-    SerialPort.list((err, allPorts) => {
+    SerialPort.list()
+    .then((allPorts) => {
       // filter the ports to only show those with a pnpId and hide internal ports
-      let ports = allPorts.filter((p) => { return p.pnpId }).map((p) => { return p.comName });
+      let ports = allPorts.filter((p) => { return p.pnpId; }).map((p) => { return p.path || p.comName; });
       res.send(ports);
     });
   }
@@ -205,7 +207,7 @@ class Watering {
     let buf = Buffer.alloc(5);
     buf[0] = RH_MSG_PING;
     for (let i = 1; i < 5; i++) {
-      buf[i] = Math.floor(Math.random()*255)
+      buf[i] = Math.floor(Math.random()*255);
     }
     this.lastPingData = buf.slice(1);
     this.rhsSend(buf);
@@ -368,11 +370,11 @@ class Watering {
           this.status.adcVolt[i] = 5/1023*this.status.adcRaw[i];
           this.status.adcVolt[i] = Math.round(this.status.adcVolt[i]*100)/100;
         }
-        this.log('Sensors: '
-          + this.status.adcVolt[0] + 'V (' + this.status.adcRaw[0] + ') '
-          + this.status.adcVolt[1] + 'V (' + this.status.adcRaw[1] + ') '
-          + this.status.adcVolt[2] + 'V (' + this.status.adcRaw[2] + ') '
-          + this.status.adcVolt[3] + 'V (' + this.status.adcRaw[3] + ')');
+        this.log('Sensors: ' +
+          this.status.adcVolt[0] + 'V (' + this.status.adcRaw[0] + ') ' +
+          this.status.adcVolt[1] + 'V (' + this.status.adcRaw[1] + ') ' +
+          this.status.adcVolt[2] + 'V (' + this.status.adcRaw[2] + ') ' +
+          this.status.adcVolt[3] + 'V (' + this.status.adcRaw[3] + ')');
         break;
 
       case RH_MSG_DHTDATA:
