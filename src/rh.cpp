@@ -204,10 +204,9 @@ void rhRecv () {
  * The data part of the message must be set in rhBufTx before calling this function.
  * @param  msgType   Type-code of this message. Will be set in rhBufTx[0].
  * @param  len       Length of the data including the type byte.
- * @param  forceSend Send the message event if push data is disabled. (default false)
  * @return           `true` if the message is successfully send.
  */
-bool rhSend(uint8_t msgType, uint8_t len, bool forceSend, uint8_t delayAfterSend) {
+bool rhSend(uint8_t msgType, uint8_t len, uint8_t delayAfterSend) {
   rhBufTx[0] = msgType;
   if (!rhManager.sendtoWait(rhBufTx, len, RH_SERVER_ADDR)) {
     blinkCode(BLINK_CODE_RH_SEND_ERROR);
@@ -303,5 +302,5 @@ bool rhSendData(uint8_t msgType, bool forceSend, uint8_t delayAfterSend) {
   }
 
   // send the data
-  return rhSend(msgType, len, forceSend, delayAfterSend);
+  return rhSend(msgType, len, delayAfterSend);
 }

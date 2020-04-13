@@ -50,7 +50,7 @@ extern uint8_t rhBufRx[RH_BUF_RX_LEN];
 
 void rhInit ();
 void rhRecv ();
-bool rhSend(uint8_t msgType, uint8_t len, bool forceSend = false, uint8_t delayAfterSend = 10);
+bool rhSend(uint8_t msgType, uint8_t len, uint8_t delayAfterSend = 10);
 bool rhSendData(uint8_t msgType, bool forceSend = RH_SEND_ONLY_WHEN_PUSH_ENABLED, uint8_t delayAfterSend = 10);
 
 #endif
