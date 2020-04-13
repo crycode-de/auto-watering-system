@@ -150,10 +150,36 @@ void rhRecv () {
           break;
 
         case RH_MSG_POLL_DATA:
-          rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
-          rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
-          rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
-          rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+          // poll data
+          if (rhRxLen >= 2) {
+            // poll with data
+            switch (rhBufRx[1]) {
+              case RH_MSG_BATTERY:
+                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
+                break;
+              case RH_MSG_CHANNEL_STATE:
+                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
+                break;
+              case RH_MSG_TEMP_SENSOR_DATA:
+                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
+                break;
+              case RH_MSG_SENSOR_VALUES:
+                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+                break;
+              default:
+                // no known poll request... send all
+                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
+                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
+                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
+                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+            }
+          } else {
+            // poll without data... send all
+            rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
+            rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
+            rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
+            rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+          }
           break;
 
         case RH_MSG_GET_VERSION:
