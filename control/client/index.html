@@ -4,7 +4,7 @@
 *
 * Frontend
 *
-* (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+* (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
 -->
 <html lang="en-US" >
   <head>
@@ -54,13 +54,18 @@
     </div>
 
     <div id="settingsDialog" style="display:none;">
-      <div>
+      <h1>
         Automatic Watering System <span id="softwareVersion"></span>
+      </h1>
+      <div id="versionOutdatedInfo">
+        <strong>Warning:</strong> The software version of the automatic watering system is outdated! Some features may not be available.
       </div>
       <div>
         <button id="checkNowButton">Check now</button>
         <button id="pingButton">Send Ping</button>
         <button id="getSettingsButton">Get settings from watering system</button>
+        <button id="pollButton">Poll data</button>
+        <button id="disconnectButton">Disconnect</button>
       </div>
       <div id="settings">
         <div class="table">
@@ -99,13 +104,17 @@
               <div class="cell">seconds</div>
             </div>
             <div class="row">
-              <div class="cell">DHT interval</div>
-              <div class="cell"><input type="number" id="dhtInterval" min="1" max="65535" required /></div>
+              <div class="cell">Temperature sensor interval</div>
+              <div class="cell"><input type="number" id="tempSensorInterval" min="1" max="65535" required /></div>
               <div class="cell">seconds</div>
             </div>
             <div class="row">
               <div class="cell">Send adc values</div>
               <div class="cell"><input type="checkbox" id="sendAdcValuesThroughRH" /></div>
+            </div>
+            <div class="row">
+              <div class="cell">Enable automatic data push via RadioHead</div>
+              <div class="cell"><input type="checkbox" id="pushDataEnabled" /></div>
             </div>
         </div>
         <div>
@@ -140,8 +149,11 @@
             </div>
             <div class="row">&nbsp;</div>
             <div class="row">
-              <div class="cell">DHT</div>
+              <div class="cell">Temperature</div>
               <div class="cell center" id="temperature"></div>
+            </div>
+            <div class="row">
+              <div class="cell">Humidity</div>
               <div class="cell center" id="humidity"></div>
             </div>
             <div class="row">

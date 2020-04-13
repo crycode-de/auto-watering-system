@@ -2,6 +2,7 @@
 - Added support for DS18B20, DS18S20, DS1820, DS1822 temperature sensors
 - Added polling mode
 - Changed some RadioHead messages
+- Updated control app to support old and new version of the automatic watering system
 
 ## v1.0.3 - 2018-06-04
 - Added fix for unplausible values read from the DHT sensor

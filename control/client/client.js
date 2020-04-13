@@ -3,15 +3,31 @@
  *
  * Frontend
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  */
 'use strict';
+
+/**
+ * Function to check if version A is greater or equal to version B.
+ */
+function checkVersionGe (vA, vB) {
+  const [, vAmajor, vAminor, vArev] = vA.match(/(\d+)\.(\d+)\.(\d+)$/);
+  const [, vBmajor, vBminor, vBrev] = vB.match(/(\d+)\.(\d+)\.(\d+)$/);
+
+  if (parseInt(vAmajor, 10) < parseInt(vBmajor, 10)) return false;
+  if (parseInt(vAminor, 10) < parseInt(vBminor, 10)) return false;
+  if (parseInt(vArev, 10) < parseInt(vBrev, 10)) return false;
+
+  return true;
+}
 
 class WateringClient {
   constructor () {
     document.getElementById('checkNowButton').onclick = this.apiCheckNow;
     document.getElementById('pingButton').onclick = this.apiPing;
+    document.getElementById('pollButton').onclick = this.apiPoll;
     document.getElementById('connectButton').onclick = this.apiConnect;
+    document.getElementById('disconnectButton').onclick = this.apiDisconnect;
     document.getElementById('getSettingsButton').onclick = this.apiGetSettings;
     document.getElementById('setSettingsButton').onclick = this.apiSetSettings;
     document.getElementById('saveSettingsButton').onclick = this.apiSaveSettings;
@@ -57,6 +73,25 @@ class WateringClient {
         document.getElementById('settingsDialog').style.display = 'none';
       }
 
+      if (this.softwareVersion != info.softwareVersion) {
+        document.getElementById('softwareVersion').innerHTML = info.softwareVersion;
+        this.softwareVersion = info.softwareVersion;
+
+        // show hint if software version of watering system is lower than the version of the controll app
+        if (checkVersionGe(this.softwareVersion, info.softwareVersionControl)) {
+          document.getElementById('versionOutdatedInfo').style.display = '';
+        } else {
+          document.getElementById('versionOutdatedInfo').style.display = 'block';
+        }
+
+        // push data can only be disabled in >= v2.0.0
+        if (checkVersionGe(this.softwareVersion, '2.0.0')) {
+          document.getElementById('pushDataEnabled').disabled = false;
+        } else {
+          document.getElementById('pushDataEnabled').disabled = true;
+        }
+      }
+
       if (info.settings) {
         document.getElementById('settings').style.display = '';
         document.getElementById('setSettingsButton').style.display = '';
@@ -69,8 +104,14 @@ class WateringClient {
             document.getElementById('wateringTime' + i).value = info.settings.wateringTime[i];
           }
           document.getElementById('checkInterval').value = info.settings.checkInterval;
-          document.getElementById('dhtInterval').value = info.settings.dhtInterval;
+          document.getElementById('tempSensorInterval').value = info.settings.tempSensorInterval;
           document.getElementById('sendAdcValuesThroughRH').checked = info.settings.sendAdcValuesThroughRH;
+
+          if (checkVersionGe(this.softwareVersion, '2.0.0')) {
+            document.getElementById('pushDataEnabled').checked = info.settings.pushDataEnabled;
+          } else {
+            document.getElementById('pushDataEnabled').checked = true;
+          }
         }
       } else {
         document.getElementById('settings').style.display = 'none';
@@ -91,11 +132,6 @@ class WateringClient {
       document.getElementById('humidity').innerHTML = info.status.humidity + ' %';
       document.getElementById('battery').innerHTML = info.status.batPercent + ' %';
       document.getElementById('battery2').innerHTML = info.status.batVolt + ' V (' + info.status.batRaw + ')';
-
-      if (this.softwareVersion != info.softwareVersion) {
-        document.getElementById('softwareVersion').innerHTML = info.softwareVersion;
-        this.softwareVersion = info.softwareVersion;
-      }
 
       if (this.logCount != info.log.length) {
         document.getElementById('log').innerHTML = info.log.map((l) => { return l.time + ' ' + l.text }).reverse().join('\n');
@@ -153,6 +189,18 @@ class WateringClient {
   }
 
   /**
+   * Method to send the 'poll data' command to the watering system.
+   */
+  apiPoll () {
+    fetch('/api/poll')
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
    * Method to send the 'get settings' command to the watering system.
    */
   apiGetSettings () {
@@ -189,8 +237,9 @@ class WateringClient {
           document.getElementById('wateringTime3').value
         ],
         checkInterval: document.getElementById('checkInterval').value,
-        dhtInterval: document.getElementById('dhtInterval').value,
-        sendAdcValuesThroughRH: document.getElementById('sendAdcValuesThroughRH').checked
+        tempSensorInterval: document.getElementById('tempSensorInterval').value,
+        sendAdcValuesThroughRH: document.getElementById('sendAdcValuesThroughRH').checked,
+        pushDataEnabled: document.getElementById('pushDataEnabled').checked
       }),
       headers: {
         'content-type': 'application/json'
@@ -283,6 +332,18 @@ class WateringClient {
       },
       method: 'POST'
     })
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
+   * Method to disconnect the backend from serial-radio gateway.
+   */
+  apiDisconnect () {
+    fetch('/api/disconnect')
     .then((res) => {
       if (res.status != 200) {
         alert('Error! ' + res.status + '\n' + res.body);

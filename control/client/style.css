@@ -3,11 +3,16 @@
  *
  * Frontend styles
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  */
 
+* {
+  font-family: Arial;
+}
+
 #fetchError {
-  background-color: #FDD;
+  border: 1px dotted #f00;
+  background: #fcc;
   color: #A00;
   font-weight: bold;
   padding: 20px;
@@ -64,5 +69,16 @@ input:focus, select:focus, button:focus {
 .on {
   background-color: #DFD;
   color: #0A0;
+  font-weight: bold;
+}
+
+#versionOutdatedInfo {
+  display: none;
+  border: 1px dotted #f00;
+  background: #fcc;
+}
+
+h1 {
+  font-size: 1.2em;
   font-weight: bold;
 }
