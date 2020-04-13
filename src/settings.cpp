@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Settings and setting-handlers for the options which can be changed at runtime.
  */
@@ -21,8 +21,9 @@ void loadDefaultSettings () {
     settings.wateringTime[chan] = 5; // opening time in seconds
   }
   settings.checkInterval = 300; // check interval - 5 minutes
-  settings.dhtInterval = 60; // dht sensor read interval - 1 minute
+  settings.tempSensorInterval = 60; // temperature sensor read interval - 1 minute
   settings.sendAdcValuesThroughRH = true; // send all read adc values using through RadioHead
+  settings.pushDataEnabled = true; // push data actively via RadioHead
 }
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * The Arduino setup function which is called once on startup.
  */
@@ -93,12 +93,21 @@ void setup () {
   // init RadioHead
   rhInit();
 
+  // init temperature sensor if necessary
+#if TEMP_SENSOR_TYPE == 1820
+  #if DS1820_RESOLUTION != 9 && DS1820_RESOLUTION != 10 && DS1820_RESOLUTION != 11 && DS1820_RESOLUTION != 12
+    #error DS1820_RESOLUTION must be 9, 10, 11 or 12!
+  #endif
 
-  // calc adc and dht next read time, 5/10 seconds from now
-  // dht read is 5 seconds before adc read to avoid both readings at the same time
-  dhtNextReadTime = millis() + 5000;
+  ds1820.begin();
+  ds1820.setResolution(DS1820_RESOLUTION);
+#endif
+
+  // calc adc and temperature sensor next read time, 5/10 seconds from now
+  // temperature sensor read is 5 seconds before adc read to avoid both readings at the same time
+  tempSensorNextReadTime = millis() + 5000;
   adcNextReadTime = millis() + 10000;
 
   // send RadioHead start message
-  rhSend(RH_MSG_START, 1);
+  rhSendData(RH_MSG_START);
 }

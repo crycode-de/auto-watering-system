@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Config containing all options which can be changed before compile.
  */
@@ -27,7 +27,7 @@
 #define RH_RX_PIN          12
 #define RH_PTT_PIN         17 // unused but needed
 #define LED_PIN            13
-#define DHT_PIN            14
+#define TEMP_SENSOR_PIN    14
 #define EEPROM_RESET_PIN   15
 
 /*
@@ -40,10 +40,20 @@
 #define BATTERY_ADC    A2
 
 /*
- * DHT temperature and humidity sensor
+ * Temperature (and humidity) sensor
  */
-// Type of the used Sensor, 11 for DHT11, 12 for DHT12, 22 for DHT22, 0 for no Sensor
-#define DHT_TYPE 22
+// Type of the used Sensor
+//  11 for DHT11
+//  12 for DHT12
+//  22 for DHT22
+//  1820 for DS18B20, DS18S20, DS1820, DS1822
+//  0 for no Sensor
+#define TEMP_SENSOR_TYPE 1820
+
+// resolution for the DS18x20 temperature sendor, if used
+// higher resolutions leads to longer conversion time
+// 9 to 12
+#define DS1820_RESOLUTION 11
 
 /*
  * RadioHead

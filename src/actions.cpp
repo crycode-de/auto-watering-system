@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Functions to do some actions.
  */
@@ -54,8 +54,7 @@ bool turnValveOn (uint8_t chan) {
   channelOn[chan] = true;
 
   // send RadioHead message
-  rhBufTx[1] = chan;
-  rhSend(RH_MSG_CHANNEL_ON, 2);
+  rhSendData(RH_MSG_CHANNEL_STATE);
 
   return true;
 }
@@ -71,6 +70,5 @@ void turnValveOff (uint8_t chan) {
   channelOn[chan] = false;
 
   // send RadioHead message
-  rhBufTx[1] = chan;
-  rhSend(RH_MSG_CHANNEL_OFF, 2);
+  rhSendData(RH_MSG_CHANNEL_STATE);
 }
