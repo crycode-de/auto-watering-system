@@ -155,11 +155,11 @@ class Watering {
 
     const port = req.body.port;
     const baud = parseInt(req.body.baud, 10);
-    let addressServer;
-    if (req.body.addressServer.startsWith('0x')) {
-      addressServer = parseInt(req.body.addressServer, 16);
+    let addressThis;
+    if (req.body.addressThis.startsWith('0x')) {
+      addressThis = parseInt(req.body.addressThis, 16);
     } else {
-      addressServer = parseInt(req.body.addressServer, 10);
+      addressThis = parseInt(req.body.addressThis, 10);
     }
     if (req.body.addressClient.startsWith('0x')) {
       this.addressClient = parseInt(req.body.addressClient, 16);
@@ -167,7 +167,7 @@ class Watering {
       this.addressClient = parseInt(req.body.addressClient, 10);
     }
 
-    if (port.length > 0 && baud > 0 && addressServer > 0 && addressServer < 255 && this.addressClient > 0 && this.addressClient < 255) {
+    if (port.length > 0 && baud > 0 && addressThis > 0 && addressThis < 255 && this.addressClient > 0 && this.addressClient < 255) {
       res.status(200);
       res.send('Ok');
     } else {
@@ -177,7 +177,7 @@ class Watering {
     }
 
     // init RadioHead
-    this.rhs = new RadioHeadSerial(port, baud, addressServer);
+    this.rhs = new RadioHeadSerial(port, baud, addressThis);
     this.rhs.setRetries(5);
     this.rhs.on('data', this.rhsReceived);
 
@@ -281,7 +281,26 @@ class Watering {
       this.settings.pushDataEnabled = req.body.pushDataEnabled;
     }
 
-    let buf = Buffer.alloc(22);
+    if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
+      if (req.body.serverAddress.startsWith('0x')) {
+        this.settings.serverAddress = parseInt(req.body.serverAddress, 16);
+      } else {
+        this.settings.serverAddress = parseInt(req.body.serverAddress, 10);
+      }
+      if (req.body.nodeAddress.startsWith('0x')) {
+        this.settings.nodeAddress = parseInt(req.body.nodeAddress, 16);
+      } else {
+        this.settings.nodeAddress = parseInt(req.body.nodeAddress, 10);
+      }
+      this.settings.delayAfterSend = parseInt(req.body.delayAfterSend, 10);
+    }
+
+    let buf;
+    if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
+      buf = Buffer.alloc(26);
+    } else {
+      buf = Buffer.alloc(22);
+    }
     buf[0] = RH_MSG_SET_SETTINGS;
 
     let bools = 0;
@@ -301,6 +320,12 @@ class Watering {
     buf[1] = bools;
     buf.writeUInt16LE(this.settings.checkInterval, 18);
     buf.writeUInt16LE(this.settings.tempSensorInterval, 20);
+
+    if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
+      buf[22] = this.settings.serverAddress;
+      buf[23] = this.settings.nodeAddress;
+      buf.writeUInt16LE(this.settings.delayAfterSend, 24);
+    }
 
     this.rhsSend(buf);
 
@@ -522,6 +547,11 @@ class Watering {
 
         if (semver.satisfies(this.softwareVersion, '>=2.0.0')) {
           this.settings.pushDataEnabled = ((msg.data[1] & (1 << 6)) != 0);
+        }
+        if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
+          this.settings.serverAddress = msg.data[22];
+          this.settings.nodeAddress = msg.data[23];
+          this.settings.delayAfterSend = msg.data.readUInt16LE(24);
         }
         break;
 

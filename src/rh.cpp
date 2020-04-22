@@ -33,6 +33,7 @@ void rhInit () {
   }
   rhManager.setRetries(RH_SEND_RETRIES);
   rhManager.setTimeout(RH_SEND_TIMEOUT);
+  rhManager.setThisAddress(settings.ownAddress); // apply own address from settings
 }
 
 /**
@@ -72,15 +73,19 @@ void rhRecv () {
           if (settings.pushDataEnabled) {
             rhBufTx[1] |= (1 << 6);
           }
+
           memcpy(&rhBufTx[18], &settings.checkInterval, 2);
           memcpy(&rhBufTx[20], &settings.tempSensorInterval, 2);
+          rhBufTx[22] = settings.serverAddress;
+          rhBufTx[23] = settings.ownAddress;
+          memcpy(&rhBufTx[24], &settings.delayAfterSend, 2);
 
-          rhSend(RH_MSG_SETTINGS, 22, RH_FORCE_SEND);
+          rhSend(RH_MSG_SETTINGS, 26, rhRxFrom);
           break;
 
         case RH_MSG_SET_SETTINGS:
           // got new settings
-          if (rhRxLen < 22) {
+          if (rhRxLen < 26) {
             return;
           }
           for (uint8_t chan = 0; chan < 4; chan++) {
@@ -92,6 +97,15 @@ void rhRecv () {
           settings.pushDataEnabled = ((rhBufRx[1] & (1 << 6)) != 0);
           memcpy(&settings.checkInterval, &rhBufRx[18], 2);
           memcpy(&settings.tempSensorInterval, &rhBufRx[20], 2);
+          settings.serverAddress = rhBufRx[22];
+
+          // apply changed own address
+          if (settings.ownAddress != rhBufRx[23]) {
+            settings.ownAddress = rhBufRx[23];
+            rhManager.setThisAddress(settings.ownAddress);
+          }
+
+          memcpy(&settings.delayAfterSend, &rhBufRx[24], 2);
 
           // calc new read times
           // temperature sensor read is 5 seconds before adc read to avoid both readings at the same time
@@ -155,36 +169,36 @@ void rhRecv () {
             // poll with data
             switch (rhBufRx[1]) {
               case RH_MSG_BATTERY:
-                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
+                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
                 break;
               case RH_MSG_CHANNEL_STATE:
-                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
+                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
                 break;
               case RH_MSG_TEMP_SENSOR_DATA:
-                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
+                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
                 break;
               case RH_MSG_SENSOR_VALUES:
-                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND, rhRxFrom);
                 break;
               default:
                 // no known poll request... send all
-                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
-                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
-                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
-                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+                rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
+                rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
+                rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND, rhRxFrom);
             }
           } else {
             // poll without data... send all
-            rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND);
-            rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND);
-            rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND);
-            rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND);
+            rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+            rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
+            rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
+            rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND, rhRxFrom);
           }
           break;
 
         case RH_MSG_GET_VERSION:
           // send the software version
-          rhSendData(RH_MSG_VERSION, RH_FORCE_SEND);
+          rhSendData(RH_MSG_VERSION, RH_FORCE_SEND, rhRxFrom);
           break;
 
         case RH_MSG_PING:
@@ -192,7 +206,7 @@ void rhRecv () {
           for (uint8_t i = 1; i < rhRxLen; i++) {
             rhBufTx[i] = rhBufRx[i];
           }
-          rhSend(RH_MSG_PONG, rhRxLen, RH_FORCE_SEND); // use rhSend directly to allow variable data length
+          rhSend(RH_MSG_PONG, rhRxLen, rhRxFrom); // use rhSend directly to allow variable data length
           break;
       }
     }
@@ -204,11 +218,12 @@ void rhRecv () {
  * The data part of the message must be set in rhBufTx before calling this function.
  * @param  msgType   Type-code of this message. Will be set in rhBufTx[0].
  * @param  len       Length of the data including the type byte.
+ * @param  sendTo    Target address to send the message to. Defaults to the configured server address.
  * @return           `true` if the message is successfully send.
  */
-bool rhSend(uint8_t msgType, uint8_t len, uint8_t delayAfterSend) {
+bool rhSend(uint8_t msgType, uint8_t len, uint8_t sendTo, uint8_t delayAfterSend) {
   rhBufTx[0] = msgType;
-  if (!rhManager.sendtoWait(rhBufTx, len, RH_SERVER_ADDR)) {
+  if (!rhManager.sendtoWait(rhBufTx, len, sendTo)) {
     blinkCode(BLINK_CODE_RH_SEND_ERROR);
     return false;
   }
@@ -223,9 +238,10 @@ bool rhSend(uint8_t msgType, uint8_t len, uint8_t delayAfterSend) {
  * The data part and the length of the message will be automatically set by global variables.
  * @param  msgType   Type-code of this message. Will be set in rhBufTx[0].
  * @param  forceSend Send the message event if push data is disabled. (default false)
+ * @param  sendTo    Target address to send the message to. Defaults to the configured server address.
  * @return           `true` if the message is successfully send.
  */
-bool rhSendData(uint8_t msgType, bool forceSend, uint8_t delayAfterSend) {
+bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint8_t delayAfterSend) {
   if (!forceSend && !settings.pushDataEnabled) {
     // to nothing if push data is not enabled and we should not force sending data
     return true;
@@ -302,5 +318,5 @@ bool rhSendData(uint8_t msgType, bool forceSend, uint8_t delayAfterSend) {
   }
 
   // send the data
-  return rhSend(msgType, len, delayAfterSend);
+  return rhSend(msgType, len, sendTo, delayAfterSend);
 }

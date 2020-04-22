@@ -38,7 +38,7 @@
         <div class="row">
           <div class="cell">Address of this node</div>
           <div class="cell">
-            <input type="text" id="addressServer" placeholder="0x01 or 1" value="0x01" required />
+            <input type="text" id="addressThis" placeholder="0x01 or 1" value="0x01" required />
           </div>
         </div>
         <div class="row">
@@ -98,6 +98,19 @@
               <div class="cell"><input type="number" id="wateringTime3" min="1" max="65535" required /></div>
             </div>
             <div class="row">&nbsp;</div>
+            <div class="row">
+              <div class="cell">Own address</div>
+              <div class="cell"><input type="text" id="nodeAddress" placeholder="0xDC or 220" required /></div>
+            </div>
+            <div class="row">
+              <div class="cell">Push data to address</div>
+              <div class="cell"><input type="text" id="serverAddress" placeholder="0x01 or 1" required /></div>
+            </div>
+            <div class="row">
+              <div class="cell">Delay after send</div>
+              <div class="cell"><input type="number" id="delayAfterSend" min="0" max="65535" required /></div>
+              <div class="cell">milliseconds</div>
+            </div>
             <div class="row">
               <div class="cell">Check interval</div>
               <div class="cell"><input type="number" id="checkInterval" min="1" max="65535" required /></div>

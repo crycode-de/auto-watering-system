@@ -24,6 +24,9 @@ void loadDefaultSettings () {
   settings.tempSensorInterval = 60; // temperature sensor read interval - 1 minute
   settings.sendAdcValuesThroughRH = true; // send all read adc values using through RadioHead
   settings.pushDataEnabled = true; // push data actively via RadioHead
+  settings.serverAddress = RH_SERVER_ADDR; // RadioHead remote node address
+  settings.ownAddress = RH_OWN_ADDR; // RadioHead address of this node
+  settings.delayAfterSend = 10; // milliseconds to delay after each send
 }
 
 /**

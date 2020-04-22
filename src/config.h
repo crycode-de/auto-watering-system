@@ -58,11 +58,12 @@
 /*
  * RadioHead
  */
-// the own RadioHead address
+// The default own RadioHead address. Can be overwritten by settings.
 #define RH_OWN_ADDR 0xDC // 220
 
-// the server RadioHead address
+// The default server RadioHead address. Can be overwritten by settings.
 #define RH_SERVER_ADDR 0x01
+
 
 // RadioHead bitrate in bit/s
 #define RH_SPEED 2000

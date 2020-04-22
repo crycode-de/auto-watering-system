@@ -90,6 +90,17 @@ class WateringClient {
         } else {
           document.getElementById('pushDataEnabled').disabled = true;
         }
+
+        // server address can only be set in >= v2.1.0
+        if (checkVersionGe(this.softwareVersion, '2.1.0')) {
+          document.getElementById('serverAddress').disabled = false;
+          document.getElementById('nodeAddress').disabled = false;
+          document.getElementById('delayAfterSend').disabled = false;
+        } else {
+          document.getElementById('serverAddress').disabled = true;
+          document.getElementById('nodeAddress').disabled = true;
+          document.getElementById('delayAfterSend').disabled = true;
+        }
       }
 
       if (info.settings) {
@@ -111,6 +122,15 @@ class WateringClient {
             document.getElementById('pushDataEnabled').checked = info.settings.pushDataEnabled;
           } else {
             document.getElementById('pushDataEnabled').checked = true;
+          }
+          if (checkVersionGe(this.softwareVersion, '2.1.0')) {
+            document.getElementById('serverAddress').value = info.settings.serverAddress;
+            document.getElementById('nodeAddress').value = info.settings.nodeAddress;
+            document.getElementById('delayAfterSend').value = info.settings.delayAfterSend;
+          } else {
+            document.getElementById('serverAddress').value = '';
+            document.getElementById('nodeAddress').value = '';
+            document.getElementById('delayAfterSend').value = 10;
           }
         }
       } else {
@@ -239,7 +259,10 @@ class WateringClient {
         checkInterval: document.getElementById('checkInterval').value,
         tempSensorInterval: document.getElementById('tempSensorInterval').value,
         sendAdcValuesThroughRH: document.getElementById('sendAdcValuesThroughRH').checked,
-        pushDataEnabled: document.getElementById('pushDataEnabled').checked
+        pushDataEnabled: document.getElementById('pushDataEnabled').checked,
+        serverAddress: document.getElementById('serverAddress').value,
+        nodeAddress: document.getElementById('nodeAddress').value,
+        delayAfterSend: document.getElementById('delayAfterSend').value
       }),
       headers: {
         'content-type': 'application/json'
@@ -324,7 +347,7 @@ class WateringClient {
       body: JSON.stringify({
         port: document.getElementById('port').value,
         baud: document.getElementById('baud').value,
-        addressServer: document.getElementById('addressServer').value,
+        addressThis: document.getElementById('addressThis').value,
         addressClient: document.getElementById('addressClient').value
       }),
       headers: {

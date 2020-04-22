@@ -1,3 +1,7 @@
+## v2.1.0 - 2020-04-22
+- Polled data will always be send to the address of the polling node
+- Made *server address*, *own address* and *delay after send* configurable at runtime
+
 ## v2.0.0 - 2020-04-13
 - Added support for DS18B20, DS18S20, DS1820, DS1822 temperature sensors
 - Added polling mode

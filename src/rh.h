@@ -37,8 +37,8 @@
 
 // buffer for RadioHead messages
 // rhBuf?x[0] - message type
-#define RH_BUF_TX_LEN 22
-#define RH_BUF_RX_LEN 22
+#define RH_BUF_TX_LEN 26
+#define RH_BUF_RX_LEN 26
 extern uint8_t rhBufTx[RH_BUF_TX_LEN];
 extern uint8_t rhBufRx[RH_BUF_RX_LEN];
 
@@ -50,7 +50,7 @@ extern uint8_t rhBufRx[RH_BUF_RX_LEN];
 
 void rhInit ();
 void rhRecv ();
-bool rhSend(uint8_t msgType, uint8_t len, uint8_t delayAfterSend = 10);
-bool rhSendData(uint8_t msgType, bool forceSend = RH_SEND_ONLY_WHEN_PUSH_ENABLED, uint8_t delayAfterSend = 10);
+bool rhSend(uint8_t msgType, uint8_t len, uint8_t sendTo = settings.serverAddress, uint8_t delayAfterSend = settings.delayAfterSend);
+bool rhSendData(uint8_t msgType, bool forceSend = RH_SEND_ONLY_WHEN_PUSH_ENABLED, uint8_t sendTo = settings.serverAddress, uint8_t delayAfterSend = settings.delayAfterSend);
 
 #endif

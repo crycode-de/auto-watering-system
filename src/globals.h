@@ -20,11 +20,11 @@
 
 // version number of the software
 #define SOFTWARE_VERSION_MAJOR 2
-#define SOFTWARE_VERSION_MINOR 0
+#define SOFTWARE_VERSION_MINOR 1
 #define SOFTWARE_VERSION_PATCH 0
 
 // version of the eeporm data model; must be increased if the data model changes
-#define EEPROM_VERSION 2
+#define EEPROM_VERSION 4
 
 // eeprom addresses
 #define EEPROM_ADDR_VERSION  0 // 1 byte
@@ -45,6 +45,9 @@ struct Settings {
   uint16_t tempSensorInterval; // temperature sensor read interval in seconds
   bool sendAdcValuesThroughRH; // send all adc values through RadioHead or not
   bool pushDataEnabled;        // if data will be actively pushed by the system over RadioHead
+  uint8_t serverAddress;       // the address of the server in the RadioHead network
+  uint8_t ownAddress;          // the address of this node in the RadioHead network
+  uint16_t delayAfterSend;     // time in milliseconds to delay after each data send
 };
 
 /**
