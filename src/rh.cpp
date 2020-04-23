@@ -221,7 +221,7 @@ void rhRecv () {
  * @param  sendTo    Target address to send the message to. Defaults to the configured server address.
  * @return           `true` if the message is successfully send.
  */
-bool rhSend(uint8_t msgType, uint8_t len, uint8_t sendTo, uint8_t delayAfterSend) {
+bool rhSend(uint8_t msgType, uint8_t len, uint8_t sendTo, uint16_t delayAfterSend) {
   rhBufTx[0] = msgType;
   if (!rhManager.sendtoWait(rhBufTx, len, sendTo)) {
     blinkCode(BLINK_CODE_RH_SEND_ERROR);
@@ -241,7 +241,7 @@ bool rhSend(uint8_t msgType, uint8_t len, uint8_t sendTo, uint8_t delayAfterSend
  * @param  sendTo    Target address to send the message to. Defaults to the configured server address.
  * @return           `true` if the message is successfully send.
  */
-bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint8_t delayAfterSend) {
+bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint16_t delayAfterSend) {
   if (!forceSend && !settings.pushDataEnabled) {
     // to nothing if push data is not enabled and we should not force sending data
     return true;

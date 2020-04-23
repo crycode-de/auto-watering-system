@@ -1,3 +1,6 @@
+## v2.1.1 - 2020-04-23
+- Fixed bug with *delay after send*
+
 ## v2.1.0 - 2020-04-22
 - Polled data will always be send to the address of the polling node
 - Made *server address*, *own address* and *delay after send* configurable at runtime
