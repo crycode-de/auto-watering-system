@@ -42,9 +42,6 @@ void loop () {
           // sensor read ok
           temperature = dhtSensor.temperature;
           humidity = dhtSensor.humidity;
-          // send RadioHead message
-          memcpy(&rhBufTx[1], &temperature, 4);
-          memcpy(&rhBufTx[5], &humidity, 4);
           sensorReadOk = true;
         } else {
           temperature = -99;
@@ -57,11 +54,6 @@ void loop () {
         temperature = ds1820.getTempCByIndex(0);
 
         if (temperature != DEVICE_DISCONNECTED_C) {
-          memcpy(&rhBufTx[1], &temperature, 4);
-          rhBufTx[5] = 0x00;
-          rhBufTx[6] = 0x00;
-          rhBufTx[7] = 0x00;
-          rhBufTx[8] = 0x00;
           sensorReadOk = true;
         } else {
           temperature = -99;
@@ -72,6 +64,26 @@ void loop () {
       #endif
 
       if (sensorReadOk) {
+        // check temperature switch
+        if (tempSwitchTriggerValueLow != 0.0 && tempSwitchTriggerValueHigh != 0.0) {
+          // automatic switching enabled
+          if (!tempSwitchOn && (
+            (temperature >= tempSwitchTriggerValueHigh && !settings.tempSwitchInverted)
+            || (temperature <= tempSwitchTriggerValueLow && settings.tempSwitchInverted)
+          )) {
+            // turn on the temperature switch
+            digitalWrite(TEMP_SWITCH_PIN, HIGH);
+            tempSwitchOn = true;
+          } else if (tempSwitchOn && (
+            (temperature <= tempSwitchTriggerValueLow && !settings.tempSwitchInverted)
+            || (temperature >= tempSwitchTriggerValueHigh && settings.tempSwitchInverted)
+          )) {
+            // turn off the temperature switch
+            digitalWrite(TEMP_SWITCH_PIN, LOW);
+            tempSwitchOn = false;
+          }
+        }
+        // send data
         rhSendData(RH_MSG_TEMP_SENSOR_DATA);
       } else {
         // sensor read error

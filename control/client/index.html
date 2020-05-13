@@ -122,6 +122,20 @@
               <div class="cell">seconds</div>
             </div>
             <div class="row">
+              <div class="cell">Temperature switch trigger value</div>
+              <div class="cell"><input type="number" id="tempSwitchTriggerValue" min="-127" max="127" step="1" required /></div>
+              <div class="cell">°C</div>
+            </div>
+            <div class="row">
+              <div class="cell">Temperature switch hysteresis</div>
+              <div class="cell"><input type="number" id="tempSwitchHyst" min="0" max="25" step="0.1" required /></div>
+              <div class="cell">°C</div>
+            </div>
+            <div class="row">
+              <div class="cell">Temperature switch inverted</div>
+              <div class="cell"><input type="checkbox" id="tempSwitchInverted" /></div>
+            </div>
+            <div class="row">
               <div class="cell">Send adc values</div>
               <div class="cell"><input type="checkbox" id="sendAdcValuesThroughRH" /></div>
             </div>
@@ -164,6 +178,8 @@
             <div class="row">
               <div class="cell">Temperature</div>
               <div class="cell center" id="temperature"></div>
+              <div class="cell center">&nbsp;</div>
+              <div class="cell center"><button id="tempSwitchOn" title="toggle"></button></div>
             </div>
             <div class="row">
               <div class="cell">Humidity</div>

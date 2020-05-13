@@ -38,6 +38,7 @@ const RH_MSG_RESUME =           0x64;
 const RH_MSG_TURN_CHANNEL_ON_OFF = 0x65; // >= v2.0.0 only
 const RH_MSG_POLL_DATA =        0x66; // >= v2.0.0 only
 const RH_MSG_PAUSE_ON_OFF =     0x67; // >= v2.0.0 only
+const RH_MSG_TURN_TEMP_SWITCH_ON_OFF = 0x68; // >= v2.2.0 only
 
 const RH_MSG_GET_VERSION =      0xF0;
 const RH_MSG_VERSION =          0xF1;
@@ -79,6 +80,7 @@ class Watering {
     this.apiPause = this.apiPause.bind(this);
     this.apiResume = this.apiResume.bind(this);
     this.apiOnoff = this.apiOnoff.bind(this);
+    this.apiTempSwitch = this.apiTempSwitch.bind(this);
     this.log = this.log.bind(this);
     this.rhsSend = this.rhsSend.bind(this);
     this.rhsReceived = this.rhsReceived.bind(this);
@@ -108,6 +110,7 @@ class Watering {
     this.app.post('/api/connect', this.apiConnect);
     this.app.get('/api/disconnect', this.apiDisconnect);
     this.app.post('/api/onoff', this.apiOnoff);
+    this.app.post('/api/tempSwitch', this.apiTempSwitch);
     this.app.post('/api/setSettings', this.apiSetSettings);
 
     // let the server listen on the configured host and port
@@ -187,7 +190,7 @@ class Watering {
 
     this.connected = true;
 
-    this.log('connected to the serial-radio gateway');
+    this.log(`connected to the serial-radio gateway via ${req.body.port}, baud ${req.body.baud}`);
 
     // request the software version from the watering system
     // use an interval to retry until we got a version
@@ -295,8 +298,16 @@ class Watering {
       this.settings.delayAfterSend = parseInt(req.body.delayAfterSend, 10);
     }
 
+    if (semver.satisfies(this.softwareVersion, '>=2.2.0')) {
+      this.settings.tempSwitchTriggerValue = parseInt(req.body.tempSwitchTriggerValue, 10);
+      this.settings.tempSwitchHyst = parseFloat(req.body.tempSwitchHyst);
+      this.settings.tempSwitchInverted = req.body.tempSwitchInverted;
+    }
+
     let buf;
-    if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
+    if (semver.satisfies(this.softwareVersion, '>=2.2.0')) {
+      buf = Buffer.alloc(28);
+    } else if (semver.satisfies(this.softwareVersion, '>=2.1.0')) {
       buf = Buffer.alloc(26);
     } else {
       buf = Buffer.alloc(22);
@@ -311,13 +322,14 @@ class Watering {
       buf.writeUInt16LE(this.settings.adcTriggerValue[chan], 2+chan*2);
       buf.writeUInt16LE(this.settings.wateringTime[chan], 10+chan*2);
     }
+
     if (this.settings.sendAdcValuesThroughRH) {
       bools |= (1 << 7);
     }
     if (semver.satisfies(this.softwareVersion, '>=2.0.0') && this.settings.pushDataEnabled) {
       bools |= (1 << 6);
     }
-    buf[1] = bools;
+
     buf.writeUInt16LE(this.settings.checkInterval, 18);
     buf.writeUInt16LE(this.settings.tempSensorInterval, 20);
 
@@ -326,6 +338,17 @@ class Watering {
       buf[23] = this.settings.nodeAddress;
       buf.writeUInt16LE(this.settings.delayAfterSend, 24);
     }
+
+    if (semver.satisfies(this.softwareVersion, '>=2.2.0')) {
+      buf.writeInt8(this.settings.tempSwitchTriggerValue, 26);
+      const tempSwitchHystTenth = Math.floor(this.settings.tempSwitchHyst * 10);
+      buf.writeUInt8(tempSwitchHystTenth, 27);
+      if (this.settings.tempSwitchInverted) {
+        bools |= (1 << 5);
+      }
+    }
+
+    buf[1] = bools;
 
     this.rhsSend(buf);
 
@@ -368,6 +391,19 @@ class Watering {
       buf[0] = req.body.on ? RH_MSG_TURN_CHANNEL_ON : RH_MSG_TURN_CHANNEL_OFF;
       buf[1] = chanToSet;
     }
+
+    this.rhsSend(buf);
+
+    res.send('Ok');
+  }
+
+  /**
+   * API endpoint for turning the temperature switch on or off at the watering system.
+   */
+  apiTempSwitch (req, res, next) {
+    const buf = Buffer.alloc(2);
+    buf[0] = RH_MSG_TURN_TEMP_SWITCH_ON_OFF;
+    buf[1] = req.body.on ? 0x01 : 0x00;
 
     this.rhsSend(buf);
 
@@ -506,6 +542,16 @@ class Watering {
         } else {
           this.status.humidity = '-';
         }
+
+        this.status.tempSwitchOn = false;
+        if (semver.satisfies(this.softwareVersion, '>=2.2.0')) {
+          // byte 5 or 6 is tempSwitchOn
+          if (msg.data.length === 6) {
+            this.status.tempSwitchOn = (msg.data[5] >= 0x01) ? true : false;
+          } else if (msg.data.length === 10) {
+            this.status.tempSwitchOn = (msg.data[9] >= 0x01) ? true : false;
+          }
+        }
         break;
 
       case RH_MSG_CHANNEL_ON: // < v2.0.0
@@ -552,6 +598,11 @@ class Watering {
           this.settings.serverAddress = msg.data[22];
           this.settings.nodeAddress = msg.data[23];
           this.settings.delayAfterSend = msg.data.readUInt16LE(24);
+        }
+        if (semver.satisfies(this.softwareVersion, '>=2.2.0')) {
+          this.settings.tempSwitchTriggerValue = msg.data.readInt8(26);
+          this.settings.tempSwitchHyst = msg.data.readUInt8(27) / 10;
+          this.settings.tempSwitchInverted = ((msg.data[1] & (1 << 5)) != 0);
         }
         break;
 

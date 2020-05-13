@@ -20,11 +20,11 @@
 
 // version number of the software
 #define SOFTWARE_VERSION_MAJOR 2
-#define SOFTWARE_VERSION_MINOR 1
-#define SOFTWARE_VERSION_PATCH 1
+#define SOFTWARE_VERSION_MINOR 2
+#define SOFTWARE_VERSION_PATCH 0
 
 // version of the eeporm data model; must be increased if the data model changes
-#define EEPROM_VERSION 4
+#define EEPROM_VERSION 5
 
 // eeprom addresses
 #define EEPROM_ADDR_VERSION  0 // 1 byte
@@ -48,6 +48,9 @@ struct Settings {
   uint8_t serverAddress;       // the address of the server in the RadioHead network
   uint8_t ownAddress;          // the address of this node in the RadioHead network
   uint16_t delayAfterSend;     // time in milliseconds to delay after each data send
+  int8_t tempSwitchTriggerValue; // value where to trigger the temperature switch
+  uint8_t tempSwitchHystTenth; // hysteresis of the temperature switch in tenth of the value (10 = 0,1)
+  bool tempSwitchInverted;     // if the switch will be inverted (default temp>value = on)
 };
 
 /**
@@ -71,6 +74,10 @@ extern uint16_t adcValues[4];
 extern float temperature;
 extern float humidity;
 extern uint16_t batteryRaw;
+
+extern bool tempSwitchOn;
+extern float tempSwitchTriggerValueHigh;
+extern float tempSwitchTriggerValueLow;
 
 extern bool pauseAutomatic;
 

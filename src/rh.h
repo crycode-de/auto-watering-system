@@ -29,6 +29,7 @@
 #define RH_MSG_TURN_CHANNEL_ON_OFF 0x65
 #define RH_MSG_POLL_DATA        0x66
 #define RH_MSG_PAUSE_ON_OFF     0x67
+#define RH_MSG_TURN_TEMP_SWITCH_ON_OFF 0x68
 
 #define RH_MSG_GET_VERSION      0xF0
 #define RH_MSG_VERSION          0xF1
@@ -37,8 +38,8 @@
 
 // buffer for RadioHead messages
 // rhBuf?x[0] - message type
-#define RH_BUF_TX_LEN 26
-#define RH_BUF_RX_LEN 26
+#define RH_BUF_TX_LEN 28
+#define RH_BUF_RX_LEN 28
 extern uint8_t rhBufTx[RH_BUF_TX_LEN];
 extern uint8_t rhBufRx[RH_BUF_RX_LEN];
 

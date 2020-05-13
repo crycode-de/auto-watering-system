@@ -73,19 +73,25 @@ void rhRecv () {
           if (settings.pushDataEnabled) {
             rhBufTx[1] |= (1 << 6);
           }
+          // bit 5 indecate if temperature switch is inverted
+          if (settings.tempSwitchInverted) {
+            rhBufTx[1] |= (1 << 5);
+          }
 
           memcpy(&rhBufTx[18], &settings.checkInterval, 2);
           memcpy(&rhBufTx[20], &settings.tempSensorInterval, 2);
           rhBufTx[22] = settings.serverAddress;
           rhBufTx[23] = settings.ownAddress;
           memcpy(&rhBufTx[24], &settings.delayAfterSend, 2);
+          rhBufTx[26] = settings.tempSwitchTriggerValue;
+          rhBufTx[27] = settings.tempSwitchHystTenth;
 
-          rhSend(RH_MSG_SETTINGS, 26, rhRxFrom);
+          rhSend(RH_MSG_SETTINGS, 28, rhRxFrom);
           break;
 
         case RH_MSG_SET_SETTINGS:
           // got new settings
-          if (rhRxLen < 26) {
+          if (rhRxLen < 28) {
             return;
           }
           for (uint8_t chan = 0; chan < 4; chan++) {
@@ -95,6 +101,7 @@ void rhRecv () {
           }
           settings.sendAdcValuesThroughRH = ((rhBufRx[1] & (1 << 7)) != 0);
           settings.pushDataEnabled = ((rhBufRx[1] & (1 << 6)) != 0);
+          settings.tempSwitchInverted = ((rhBufRx[1] & (1 << 5)) != 0);
           memcpy(&settings.checkInterval, &rhBufRx[18], 2);
           memcpy(&settings.tempSensorInterval, &rhBufRx[20], 2);
           settings.serverAddress = rhBufRx[22];
@@ -106,6 +113,12 @@ void rhRecv () {
           }
 
           memcpy(&settings.delayAfterSend, &rhBufRx[24], 2);
+
+          settings.tempSwitchTriggerValue = rhBufRx[26];
+          settings.tempSwitchHystTenth = rhBufRx[27];
+
+          // calc temperature switch high/low trigger values
+          calcTempSwitchTriggerValues();
 
           // calc new read times
           // temperature sensor read is 5 seconds before adc read to avoid both readings at the same time
@@ -137,6 +150,21 @@ void rhRecv () {
               channelTurnOffTime[chan] = millis();
             }
           }
+          break;
+
+        case RH_MSG_TURN_TEMP_SWITCH_ON_OFF:
+          // temperature switch on/off
+          if (rhRxLen < 2) {
+            return;
+          }
+          if (rhBufRx[1] == 0x01) {
+            digitalWrite(TEMP_SWITCH_PIN, HIGH);
+            tempSwitchOn = true;
+          } else {
+            digitalWrite(TEMP_SWITCH_PIN, LOW);
+            tempSwitchOn = false;
+          }
+          rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
           break;
 
         case RH_MSG_PAUSE:
@@ -265,10 +293,12 @@ bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint16_t delayA
       #if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
         memcpy(&rhBufTx[1], &temperature, 4);
         memcpy(&rhBufTx[5], &humidity, 4);
-        len = 9;
+        rhBufTx[9] = (tempSwitchOn) ? 0x01 : 0x00;
+        len = 10;
       #elif TEMP_SENSOR_TYPE == 1820
         memcpy(&rhBufTx[1], &temperature, 4);
-        len = 5;
+        rhBufTx[5] = (tempSwitchOn) ? 0x01 : 0x00;
+        len = 6;
       #else
         // nothing to do if no sensor is enabled
         return true;

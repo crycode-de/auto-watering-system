@@ -28,6 +28,7 @@ void setup () {
   pinMode(SENSORS_ACTIVE_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
   pinMode(EEPROM_RESET_PIN, INPUT_PULLUP);
+  pinMode(TEMP_SWITCH_PIN, OUTPUT);
 
   // blink the LED to indecate starting
   blinkCode(BLINK_LONG);
@@ -40,6 +41,7 @@ void setup () {
     digitalWrite(valvePins[chan], LOW);
   }
   digitalWrite(SENSORS_ACTIVE_PIN, LOW);
+  digitalWrite(TEMP_SWITCH_PIN, LOW);
   pauseAutomatic = false;
 
   // enable PCINT for the buttons

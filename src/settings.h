@@ -11,5 +11,6 @@
 void loadDefaultSettings ();
 void loadSettings ();
 void saveSettings ();
+void calcTempSwitchTriggerValues();
 
 #endif

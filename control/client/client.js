@@ -39,6 +39,7 @@ class WateringClient {
     }
     document.getElementById('pause').onclick = this.apiPause;
     document.getElementById('resume').onclick = this.apiResume;
+    document.getElementById('tempSwitchOn').onclick = this.apiTempSwitch.bind(this);
 
     this.apiGetInfo = this.apiGetInfo.bind(this);
 
@@ -101,6 +102,19 @@ class WateringClient {
           document.getElementById('nodeAddress').disabled = true;
           document.getElementById('delayAfterSend').disabled = true;
         }
+
+        // temperature switch only available in >= v2.2.0
+        if (checkVersionGe(this.softwareVersion, '2.2.0')) {
+          document.getElementById('tempSwitchTriggerValue').disabled = false;
+          document.getElementById('tempSwitchHyst').disabled = false;
+          document.getElementById('tempSwitchInverted').disabled = false;
+          document.getElementById('tempSwitchOn').disabled = false;
+        } else {
+          document.getElementById('tempSwitchTriggerValue').disabled = true;
+          document.getElementById('tempSwitchHyst').disabled = true;
+          document.getElementById('tempSwitchInverted').disabled = true;
+          document.getElementById('tempSwitchOn').disabled = true;
+        }
       }
 
       if (info.settings) {
@@ -132,6 +146,15 @@ class WateringClient {
             document.getElementById('nodeAddress').value = '';
             document.getElementById('delayAfterSend').value = 10;
           }
+          if (checkVersionGe(this.softwareVersion, '2.2.0')) {
+            document.getElementById('tempSwitchTriggerValue').value = info.settings.tempSwitchTriggerValue;
+            document.getElementById('tempSwitchHyst').value = info.settings.tempSwitchHyst;
+            document.getElementById('tempSwitchInverted').checked = info.settings.tempSwitchInverted;
+          } else {
+            document.getElementById('tempSwitchTriggerValue').value = 0;
+            document.getElementById('tempSwitchHyst').value = 0;
+            document.getElementById('tempSwitchInverted').checked = false;
+          }
         }
       } else {
         document.getElementById('settings').style.display = 'none';
@@ -152,6 +175,14 @@ class WateringClient {
       document.getElementById('humidity').innerHTML = info.status.humidity + ' %';
       document.getElementById('battery').innerHTML = info.status.batPercent + ' %';
       document.getElementById('battery2').innerHTML = info.status.batVolt + ' V (' + info.status.batRaw + ')';
+
+      if (info.status.tempSwitchOn) {
+        document.getElementById('tempSwitchOn').innerHTML = 'On';
+        document.getElementById('tempSwitchOn').classList.add('on');
+      } else {
+        document.getElementById('tempSwitchOn').innerHTML = 'Off';
+        document.getElementById('tempSwitchOn').classList.remove('on');
+      }
 
       if (this.logCount != info.log.length) {
         document.getElementById('log').innerHTML = info.log.map((l) => { return l.time + ' ' + l.text }).reverse().join('\n');
@@ -262,7 +293,10 @@ class WateringClient {
         pushDataEnabled: document.getElementById('pushDataEnabled').checked,
         serverAddress: document.getElementById('serverAddress').value,
         nodeAddress: document.getElementById('nodeAddress').value,
-        delayAfterSend: document.getElementById('delayAfterSend').value
+        delayAfterSend: document.getElementById('delayAfterSend').value,
+        tempSwitchTriggerValue: document.getElementById('tempSwitchTriggerValue').value,
+        tempSwitchHyst: document.getElementById('tempSwitchHyst').value,
+        tempSwitchInverted: document.getElementById('tempSwitchInverted').checked,
       }),
       headers: {
         'content-type': 'application/json'
@@ -293,7 +327,7 @@ class WateringClient {
    * Called by pressing a button.
    */
   apiOnoff (event) {
-    let data = {
+    const data = {
       channel: event.target.dataset.chan || 0,
       on: false // turn off by default
     };
@@ -302,6 +336,28 @@ class WateringClient {
       data.on = true;
     }
     fetch('/api/onoff', {
+      body: JSON.stringify(data),
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'POST'
+    })
+    .then((res) => {
+      if (res.status != 200) {
+        alert('Error! ' + res.status + '\n' + res.body);
+      }
+    });
+  }
+
+  /**
+   * Method to turn the temperature switch on/off.
+   * Called by pressing a button.
+   */
+  apiTempSwitch (event) {
+    const data = {
+      on: !this.info.status.tempSwitchOn
+    };
+    fetch('/api/tempSwitch', {
       body: JSON.stringify(data),
       headers: {
         'content-type': 'application/json'

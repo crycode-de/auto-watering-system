@@ -1,3 +1,6 @@
+## v2.2.0 - 2020-05-13
+- Added temperature-dependent switch to control a fan or heating
+
 ## v2.1.1 - 2020-04-23
 - Fixed bug with *delay after send*
 

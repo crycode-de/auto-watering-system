@@ -22,6 +22,9 @@ uint16_t adcValues[4] = {0, 0, 0, 0};
 float temperature = -99;
 float humidity = -99;
 uint16_t batteryRaw;
+bool tempSwitchOn = false;
+float tempSwitchTriggerValueHigh = 32;
+float tempSwitchTriggerValueLow = 28;
 
 bool pauseAutomatic;
 
