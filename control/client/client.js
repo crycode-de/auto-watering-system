@@ -1,5 +1,5 @@
 /*
- * Automatic Watering System Control App
+ * Automatic Watering System - Control-App
  *
  * Frontend
  *
@@ -41,6 +41,15 @@ class WateringClient {
     document.getElementById('resume').onclick = this.apiResume;
     document.getElementById('tempSwitchOn').onclick = this.apiTempSwitch.bind(this);
 
+    document.getElementById('deButton').onclick = () => {
+      this.i18n.lang = 'de';
+      this.i18n.translateAll();
+    }
+    document.getElementById('enButton').onclick = () => {
+      this.i18n.lang = 'en';
+      this.i18n.translateAll();
+    }
+
     this.apiGetInfo = this.apiGetInfo.bind(this);
 
     this.settingsTime = 0;
@@ -50,6 +59,8 @@ class WateringClient {
 
     this.apiGetPorts();
     this.apiGetInfo();
+
+    this.i18n = new I18n();
 
     // start interval to get the info every second
     window.setInterval(this.apiGetInfo, 1000);
@@ -163,7 +174,8 @@ class WateringClient {
       }
 
       for (let i = 0; i < 4; i++) {
-        document.getElementById('onoff' + i).innerHTML = info.status.on[i] ? 'On' : 'Off';
+        document.getElementById('onoff' + i).innerHTML = info.status.on[i] ? this.i18n.__('on') : this.i18n.__('off');
+        document.getElementById('onoff' + i).dataset.translate = info.status.on[i] ? 'on' : 'off';
         if (info.status.on[i]) {
           document.getElementById('onoff' + i).classList.add('on');
         } else {
@@ -177,10 +189,12 @@ class WateringClient {
       document.getElementById('battery2').innerHTML = info.status.batVolt + ' V (' + info.status.batRaw + ')';
 
       if (info.status.tempSwitchOn) {
-        document.getElementById('tempSwitchOn').innerHTML = 'On';
+        document.getElementById('tempSwitchOn').innerHTML = this.i18n.__('on');
+        document.getElementById('tempSwitchOn').dataset.translate = 'on';
         document.getElementById('tempSwitchOn').classList.add('on');
       } else {
-        document.getElementById('tempSwitchOn').innerHTML = 'Off';
+        document.getElementById('tempSwitchOn').innerHTML = this.i18n.__('off');
+        document.getElementById('tempSwitchOn').dataset.translate = 'off';
         document.getElementById('tempSwitchOn').classList.remove('on');
       }
 

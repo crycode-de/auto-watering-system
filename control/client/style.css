@@ -1,5 +1,5 @@
 /*
- * Automatic Watering System Control App
+ * Automatic Watering System - Control-App
  *
  * Frontend styles
  *
@@ -46,6 +46,10 @@
 
 .cell input, .cell button {
   width: 80px;
+}
+
+.cell button.wide {
+  width: auto;
 }
 
 #port {
