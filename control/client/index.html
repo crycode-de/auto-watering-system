@@ -91,66 +91,78 @@
               <div class="cell"><input type="checkbox" id="channelEnabled3" /></div>
             </div>
             <div class="row">
-              <div class="cell" data-translate>adcTriggerValues</div>
+              <div class="cell"><span data-translate>adcTriggerValues</span> <span data-info="adcTriggerValuesInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="adcTriggerValue0" min="0" max="1023" required /></div>
               <div class="cell"><input type="number" id="adcTriggerValue1" min="0" max="1023" required /></div>
               <div class="cell"><input type="number" id="adcTriggerValue2" min="0" max="1023" required /></div>
               <div class="cell"><input type="number" id="adcTriggerValue3" min="0" max="1023" required /></div>
             </div>
+            <div class="description" id="adcTriggerValuesInfo" data-translate>adcTriggerValuesInfo</div>
             <div class="row">
-              <div class="cell" data-translate>wateringTimes</div>
+              <div class="cell"><span data-translate>wateringTimes</span> <span data-info="wateringTimesInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="wateringTime0" min="1" max="65535" required /></div>
               <div class="cell"><input type="number" id="wateringTime1" min="1" max="65535" required /></div>
               <div class="cell"><input type="number" id="wateringTime2" min="1" max="65535" required /></div>
               <div class="cell"><input type="number" id="wateringTime3" min="1" max="65535" required /></div>
               <div class="cell" data-translate>seconds</div>
             </div>
+            <div class="description" id="wateringTimesInfo" data-translate>wateringTimesInfo</div>
             <div class="row">&nbsp;</div>
             <div class="row">
-              <div class="cell" data-translate>ownAddress</div>
+              <div class="cell"><span data-translate>ownAddress</span> <span data-info="ownAddressInfo">ℹ️</span></div>
               <div class="cell"><input type="text" id="nodeAddress" placeholder="0xDCor220" data-translate-placeholder required /></div>
             </div>
+            <div class="description" id="ownAddressInfo" data-translate>ownAddressInfo</div>
             <div class="row">
-              <div class="cell" data-translate>pushDataToAddress</div>
+              <div class="cell"><span data-translate>pushDataToAddress</span> <span data-info="pushDataToAddressInfo">ℹ️</span></div>
               <div class="cell"><input type="text" id="serverAddress" placeholder="0x01or1" data-translate-placeholder required /></div>
             </div>
+            <div class="description" id="pushDataToAddressInfo" data-translate>pushDataToAddressInfo</div>
             <div class="row">
-              <div class="cell" data-translate>delayAfterSend</div>
+              <div class="cell"><span data-translate>delayAfterSend</span> <span data-info="delayAfterSendInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="delayAfterSend" min="0" max="65535" required /></div>
               <div class="cell" data-translate>milliseconds</div>
             </div>
+            <div class="description" id="delayAfterSendInfo" data-translate>delayAfterSendInfo</div>
             <div class="row">
-              <div class="cell" data-translate>checkInterval</div>
+              <div class="cell"><span data-translate>checkInterval</span> <span data-info="checkIntervalInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="checkInterval" min="1" max="65535" required /></div>
               <div class="cell" data-translate>seconds</div>
             </div>
+            <div class="description" id="checkIntervalInfo" data-translate>checkIntervalInfo</div>
             <div class="row">
-              <div class="cell" data-translate>temperatureSensorInterval</div>
+              <div class="cell"><span data-translate>temperatureSensorInterval</span> <span data-info="temperatureSensorIntervalInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="tempSensorInterval" min="1" max="65535" required /></div>
               <div class="cell" data-translate>seconds</div>
             </div>
+            <div class="description" id="temperatureSensorIntervalInfo" data-translate>temperatureSensorIntervalInfo</div>
             <div class="row">
-              <div class="cell" data-translate>temperatureSwitchTriggerValue</div>
+              <div class="cell"><span data-translate>temperatureSwitchTriggerValue</span> <span data-info="temperatureSwitchTriggerValueInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="tempSwitchTriggerValue" min="-127" max="127" step="1" required /></div>
               <div class="cell">°C</div>
             </div>
+            <div class="description" id="temperatureSwitchTriggerValueInfo" data-translate>temperatureSwitchTriggerValueInfo</div>
             <div class="row">
-              <div class="cell" data-translate>temperatureSwitchHysteresis</div>
+              <div class="cell"><span data-translate>temperatureSwitchHysteresis</span> <span data-info="temperatureSwitchHysteresisInfo">ℹ️</span></div>
               <div class="cell"><input type="number" id="tempSwitchHyst" min="0" max="25" step="0.1" required /></div>
               <div class="cell">°C</div>
             </div>
+            <div class="description" id="temperatureSwitchHysteresisInfo" data-translate>temperatureSwitchHysteresisInfo</div>
             <div class="row">
-              <div class="cell" data-translate>temperatureSwitchInverted</div>
+              <div class="cell"><span data-translate>temperatureSwitchInverted</span> <span data-info="temperatureSwitchInvertedInfo">ℹ️</span></div>
               <div class="cell"><input type="checkbox" id="tempSwitchInverted" /></div>
             </div>
+            <div class="description" id="temperatureSwitchInvertedInfo" data-translate>temperatureSwitchInvertedInfo</div>
             <div class="row">
-              <div class="cell" data-translate>sendAdcValues</div>
+              <div class="cell"><span data-translate>sendAdcValues</span> <span data-info="sendAdcValuesInfo">ℹ️</span></div>
               <div class="cell"><input type="checkbox" id="sendAdcValuesThroughRH" /></div>
             </div>
+            <div class="description" id="sendAdcValuesInfo" data-translate>sendAdcValuesInfo</div>
             <div class="row">
-              <div class="cell" data-translate>enableAutomaticDataPush</div>
+              <div class="cell"><span data-translate>enableAutomaticDataPush</span> <span data-info="enableAutomaticDataPushInfo">ℹ️</span></div>
               <div class="cell"><input type="checkbox" id="pushDataEnabled" /></div>
             </div>
+            <div class="description" id="enableAutomaticDataPushInfo" data-translate>enableAutomaticDataPushInfo</div>
         </div>
         <div>
           <button id="setSettingsButton" data-translate>sendSettings</button>

@@ -52,6 +52,21 @@ class WateringClient {
 
     this.apiGetInfo = this.apiGetInfo.bind(this);
 
+    // enable info icons
+    const elems = document.querySelectorAll('[data-info]');
+    for (let i = 0; i < elems.length; i++) {
+      let key = elems[i].dataset.info;
+      elems[i].onclick = (event) => {
+        const infoElem = document.getElementById(event.target.dataset.info);
+        if (infoElem.style.display === 'block') {
+          infoElem.style.display = '';
+        } else {
+          infoElem.style.display = 'block';
+        }
+      };
+    }
+
+
     this.settingsTime = 0;
     this.softwareVersion = null;
     this.logCount = 0;
