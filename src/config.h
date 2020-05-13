@@ -23,13 +23,14 @@
 #define VALVE_2_BUTTON_PIN 8
 #define VALVE_3_BUTTON_PIN 9
 #define SENSORS_ACTIVE_PIN 10
-#define RH_TX_PIN          11
-#define RH_RX_PIN          12
-#define RH_PTT_PIN         18 // unused but needed
 #define LED_PIN            13
 #define TEMP_SENSOR_PIN    14
 #define EEPROM_RESET_PIN   15
 #define TEMP_SWITCH_PIN    17
+
+#define RH_TX_PIN          11
+#define RH_RX_PIN          12
+#define RH_PTT_PIN         EEPROM_RESET_PIN // unused but needed ... set to EEPROM_RESET_PIN because this is only used at early startup -> no conflicts :-)
 
 /*
  * Analog pins
