@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Settings and setting-handlers for the options which can be changed at runtime.
  */
@@ -21,8 +21,17 @@ void loadDefaultSettings () {
     settings.wateringTime[chan] = 5; // opening time in seconds
   }
   settings.checkInterval = 300; // check interval - 5 minutes
-  settings.dhtInterval = 60; // dht sensor read interval - 1 minute
+  settings.tempSensorInterval = 60; // temperature sensor read interval - 1 minute
   settings.sendAdcValuesThroughRH = true; // send all read adc values using through RadioHead
+  settings.pushDataEnabled = true; // push data actively via RadioHead
+  settings.serverAddress = RH_SERVER_ADDR; // RadioHead remote node address
+  settings.ownAddress = RH_OWN_ADDR; // RadioHead address of this node
+  settings.delayAfterSend = 10; // milliseconds to delay after each send
+  settings.tempSwitchTriggerValue = 30; // turn on temperature switch if > 30°C
+  settings.tempSwitchHystTenth = 20; // 2°C hysteresis -> 32°C on, 28°C off
+  settings.tempSwitchInverted = false; // don't invert - turn on if greater
+
+  calcTempSwitchTriggerValues();
 }
 
 /**
@@ -30,6 +39,8 @@ void loadDefaultSettings () {
  */
 void loadSettings () {
   EEPROM.get(EEPROM_ADDR_SETTINGS, settings);
+
+  calcTempSwitchTriggerValues();
 }
 
 /**
@@ -38,4 +49,12 @@ void loadSettings () {
 void saveSettings () {
   // write to eeprom
   EEPROM.put(EEPROM_ADDR_SETTINGS, settings);
+}
+
+/**
+ * Calculate temperature switch high/low trigger values.
+ */
+void calcTempSwitchTriggerValues () {
+  tempSwitchTriggerValueHigh = settings.tempSwitchTriggerValue + (float)settings.tempSwitchHystTenth/10;
+  tempSwitchTriggerValueLow = settings.tempSwitchTriggerValue - (float)settings.tempSwitchHystTenth/10;
 }

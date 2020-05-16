@@ -1,13 +1,18 @@
 /*
- * Automatic Watering System Control App
+ * Automatic Watering System - Control-App
  *
  * Frontend styles
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  */
 
+* {
+  font-family: Arial;
+}
+
 #fetchError {
-  background-color: #FDD;
+  border: 1px dotted #f00;
+  background: #fcc;
   color: #A00;
   font-weight: bold;
   padding: 20px;
@@ -43,6 +48,10 @@
   width: 80px;
 }
 
+.cell button.wide {
+  width: auto;
+}
+
 #port {
   width: 150px;
 }
@@ -64,5 +73,53 @@ input:focus, select:focus, button:focus {
 .on {
   background-color: #DFD;
   color: #0A0;
+  font-weight: bold;
+}
+
+#versionOutdatedInfo {
+  display: none;
+  border: 1px dotted #f00;
+  background: #fcc;
+}
+
+h1 {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+[data-info] {
+  color: #009;
+  cursor: pointer;
+  font-weight: bold;
+  user-select: none;
+
+  float: right;
+  display: inline-block;
+  width: 20px;
+  margin: 0 3px;
+  text-align: center;
+  border-radius: 8px;
+  background: #ddd;
+}
+
+[data-info]:hover {
+  background: #eee;
+  color: #00a;
+}
+
+.description {
+  padding: 10px;
+  left: 50px;
+  min-width: 50%;
+  display: none;
+  position: absolute;
+  background: #eeeeeef0;
+  box-shadow: 5px 5px #aaaaaa55;
+  border: 1px dotted #aaa;
+}
+
+code {
+  font-family: monospace;
+  font-size: 1.2em;
   font-weight: bold;
 }

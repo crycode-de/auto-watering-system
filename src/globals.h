@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  */
 #ifndef __GLOBALS_H__
 #define __GLOBALS_H__
@@ -10,18 +10,21 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#if DHT_TYPE != 0
+#if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
   #include <dht.h>
+#elif TEMP_SENSOR_TYPE == 1820
+  #include <OneWire.h>
+  #include <DallasTemperature.h>
 #endif
 #include <PinChangeInterrupt.h>
 
 // version number of the software
-#define SOFTWARE_VERSION_MAJOR 1
-#define SOFTWARE_VERSION_MINOR 0
-#define SOFTWARE_VERSION_PATCH 3
+#define SOFTWARE_VERSION_MAJOR 2
+#define SOFTWARE_VERSION_MINOR 3
+#define SOFTWARE_VERSION_PATCH 0
 
 // version of the eeporm data model; must be increased if the data model changes
-#define EEPROM_VERSION 1
+#define EEPROM_VERSION 5
 
 // eeprom addresses
 #define EEPROM_ADDR_VERSION  0 // 1 byte
@@ -39,8 +42,15 @@ struct Settings {
   uint16_t adcTriggerValue[4]; // minimum adc value which will trigger the watering
   uint16_t wateringTime[4];    // watering time in seconds
   uint16_t checkInterval;      // adc check interval in seconds
-  uint16_t dhtInterval;        // dht sensor read interval in seconds
+  uint16_t tempSensorInterval; // temperature sensor read interval in seconds
   bool sendAdcValuesThroughRH; // send all adc values through RadioHead or not
+  bool pushDataEnabled;        // if data will be actively pushed by the system over RadioHead
+  uint8_t serverAddress;       // the address of the server in the RadioHead network
+  uint8_t ownAddress;          // the address of this node in the RadioHead network
+  uint16_t delayAfterSend;     // time in milliseconds to delay after each data send
+  int8_t tempSwitchTriggerValue; // value where to trigger the temperature switch
+  uint8_t tempSwitchHystTenth; // hysteresis of the temperature switch in tenth of the value (10 = 0,1)
+  bool tempSwitchInverted;     // if the switch will be inverted (default temp>value = on)
 };
 
 /**
@@ -53,17 +63,31 @@ struct Settings {
 // global variables
 extern Settings settings;
 
+
 extern volatile bool channelTurnOn[4]; // volatile to use this inside a ISR
 extern volatile unsigned long channelTurnOffTime[4];
 extern unsigned long adcNextReadTime;
-extern unsigned long dhtNextReadTime;
+extern unsigned long tempSensorNextReadTime;
 
 extern volatile bool channelOn[4];
+extern uint16_t adcValues[4];
+extern float temperature;
+extern float humidity;
+
+#if BAT_ENABLED == 1
+  extern uint16_t batteryRaw;
+#endif
+
+extern bool tempSwitchOn;
+extern float tempSwitchTriggerValueHigh;
+extern float tempSwitchTriggerValueLow;
 
 extern bool pauseAutomatic;
 
-#if DHT_TYPE != 0
+#if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
   extern dht dhtSensor;
+#elif TEMP_SENSOR_TYPE == 1820
+  extern DallasTemperature ds1820;
 #endif
 
 #endif

@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * The Arduino loop function which is called in a infinite loop.
  */
@@ -17,38 +17,81 @@ bool adcOn = false;
 void loop () {
   unsigned long now = millis();
 
-  // DHT code only if DHT_TYPE is not zero
-  #if DHT_TYPE != 0
-    // check if we need to read from the dht sensor
-    if (checkTime(now, dhtNextReadTime)) {
+  // temperature sensor code only if TEMP_SENSOR_TYPE is not 0
+  #if TEMP_SENSOR_TYPE != 0
+    // check if we need to read from the temperature sensor
+    if (checkTime(now, tempSensorNextReadTime)) {
       // read from the sensor using the correct method for the sensor type
-      #if DHT_TYPE == 11
-        int dhtResult = dhtSensor.read11(DHT_PIN);
-      #elif DHT_TYPE == 12
-        int dhtResult = dhtSensor.read12(DHT_PIN);
-      #elif DHT_TYPE == 22
-        int dhtResult = dhtSensor.read22(DHT_PIN);
+
+      bool sensorReadOk = false;
+
+      #if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
+        // DHT sensor
+        #if TEMP_SENSOR_TYPE == 11
+          int dhtResult = dhtSensor.read11(TEMP_SENSOR_PIN);
+        #elif TEMP_SENSOR_TYPE == 12
+          int dhtResult = dhtSensor.read12(TEMP_SENSOR_PIN);
+        #elif TEMP_SENSOR_TYPE == 22
+          int dhtResult = dhtSensor.read22(TEMP_SENSOR_PIN);
+        #endif
+
+        // check the result and also if the values are plausible
+        if (dhtResult == DHTLIB_OK
+          && dhtSensor.humidity >= 0 && dhtSensor.humidity <= 100
+          && dhtSensor.temperature >= -50 && dhtSensor.temperature <= 100) {
+          // sensor read ok
+          temperature = dhtSensor.temperature;
+          humidity = dhtSensor.humidity;
+          sensorReadOk = true;
+        } else {
+          temperature = -99;
+          humidity = -99;
+        }
+
+      #elif TEMP_SENSOR_TYPE == 1820
+        // DS18x20 sensor
+        ds1820.requestTemperatures();
+        temperature = ds1820.getTempCByIndex(0);
+
+        if (temperature != DEVICE_DISCONNECTED_C) {
+          sensorReadOk = true;
+        } else {
+          temperature = -99;
+        }
+
       #else
-        #error DHT_TYPE must be 11, 12, 22 or 0!
+        #error TEMP_SENSOR_TYPE must be 11, 12, 22, 1820 or 0!
       #endif
 
-      // check the result and also if the values are plausible
-      if (dhtResult == DHTLIB_OK
-        && dhtSensor.humidity >= 0 && dhtSensor.humidity <= 100
-        && dhtSensor.temperature >= -50 && dhtSensor.temperature <= 100) {
-        // sensor read ok
-        // send RadioHead message
-        memcpy(&rhBufTx[1], &dhtSensor.temperature, 4);
-        memcpy(&rhBufTx[5], &dhtSensor.humidity, 4);
-        rhSend(RH_MSG_DHTDATA, 9);
-
+      if (sensorReadOk) {
+        // check temperature switch
+        if (tempSwitchTriggerValueLow != 0.0 && tempSwitchTriggerValueHigh != 0.0) {
+          // automatic switching enabled
+          if (!tempSwitchOn && (
+            (temperature >= tempSwitchTriggerValueHigh && !settings.tempSwitchInverted)
+            || (temperature <= tempSwitchTriggerValueLow && settings.tempSwitchInverted)
+          )) {
+            // turn on the temperature switch
+            digitalWrite(TEMP_SWITCH_PIN, HIGH);
+            tempSwitchOn = true;
+          } else if (tempSwitchOn && (
+            (temperature <= tempSwitchTriggerValueLow && !settings.tempSwitchInverted)
+            || (temperature >= tempSwitchTriggerValueHigh && settings.tempSwitchInverted)
+          )) {
+            // turn off the temperature switch
+            digitalWrite(TEMP_SWITCH_PIN, LOW);
+            tempSwitchOn = false;
+          }
+        }
+        // send data
+        rhSendData(RH_MSG_TEMP_SENSOR_DATA);
       } else {
         // sensor read error
-        blinkCode(BLINK_CODE_DHT_ERROR);
+        blinkCode(BLINK_CODE_TEMP_SENSOR_ERROR);
       }
 
       // calc next dht read time
-      dhtNextReadTime = now + ((uint32_t)settings.dhtInterval * 1000);
+      tempSensorNextReadTime = now + ((uint32_t)settings.tempSensorInterval * 1000);
     }
   #endif
 
@@ -73,47 +116,26 @@ void loop () {
       for (uint8_t chan = 0; chan < 4; chan++) {
         if (settings.channelEnabled[chan]) {
           // read the adc value of the channel
-          uint16_t adcVal = analogRead(sensorAdcPins[chan]);
+          adcValues[chan] = analogRead(sensorAdcPins[chan]);
           // check trigger value
-          if (adcVal >= settings.adcTriggerValue[chan]) {
+          if (adcValues[chan] >= settings.adcTriggerValue[chan]) {
             // set marker to turn the channel on
             channelTurnOn[chan] = true;
           }
-          // save for RadioHead
-          if (settings.sendAdcValuesThroughRH) {
-            memcpy(&rhBufTx[1+chan*2], &adcVal, 2);
-          }
-        } else if (settings.sendAdcValuesThroughRH) {
-          // if channel is disabled but sending adc values is enabled set the value in buffer to 0x0000
-          rhBufTx[1+chan*2] = 0x00;
-          rhBufTx[2+chan*2] = 0x00;
         }
       }
-      // send adc sensor values through RadioHead
-      if (settings.sendAdcValuesThroughRH) {
-        // send RadioHead message
-        rhSend(RH_MSG_SENSOR_VALUES, 9);
-      }
+      // send RadioHead message (send adc check is done later...)
+      rhSendData(RH_MSG_SENSOR_VALUES);
     }
 
     // disable the sensors
     digitalWrite(SENSORS_ACTIVE_PIN, LOW);
 
     // read battery voltage
-    uint16_t batRaw = analogRead(BATTERY_ADC);
-    uint8_t batPercent;
-    if (batRaw <= BAT_ADC_LOW) {
-      batPercent = 0;
-    } else if (batRaw >= BAT_ADC_FULL) {
-      batPercent = 100;
-    } else {
-      batPercent = 100 * (batRaw - BAT_ADC_LOW) / (BAT_ADC_FULL - BAT_ADC_LOW);
-    }
-
-    // send RadioHead message
-    rhBufTx[1] = batPercent;
-    memcpy(&rhBufTx[2], &batRaw, 2);
-    rhSend(RH_MSG_BATTERY, 4);
+    #if BAT_ENABLED == 1
+      batteryRaw = analogRead(BATTERY_ADC);
+      rhSendData(RH_MSG_BATTERY);
+    #endif
 
     // disable the adc
     ADCSRA &= ~(1<<ADEN);
