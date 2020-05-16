@@ -79,7 +79,7 @@
 /*
  * Battery adc values
  */
-#define BAT_ADC_LOW  511 // 2,5V
+#define BAT_ADC_LOW  593 // 2,9V
 #define BAT_ADC_FULL 859 // 4,2V
 
 #endif
