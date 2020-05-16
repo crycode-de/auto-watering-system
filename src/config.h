@@ -77,9 +77,13 @@
 #define RH_SEND_TIMEOUT 200
 
 /*
- * Battery adc values
+ * Battery
  */
-#define BAT_ADC_LOW  593 // 2,9V
-#define BAT_ADC_FULL 859 // 4,2V
+// Enable battery readings (1 enabled, 0 disabled)
+#define BAT_ENABLED 1
+
+// Battery adc values
+#define BAT_ADC_LOW  593 // 2.9V # 1023 * 2.9V / 5V
+#define BAT_ADC_FULL 859 // 4.2V # 1023 * 4.2V / 5V
 
 #endif

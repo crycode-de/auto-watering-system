@@ -132,8 +132,10 @@ void loop () {
     digitalWrite(SENSORS_ACTIVE_PIN, LOW);
 
     // read battery voltage
-    batteryRaw = analogRead(BATTERY_ADC);
-    rhSendData(RH_MSG_BATTERY);
+    #if BAT_ENABLED == 1
+      batteryRaw = analogRead(BATTERY_ADC);
+      rhSendData(RH_MSG_BATTERY);
+    #endif
 
     // disable the adc
     ADCSRA &= ~(1<<ADEN);

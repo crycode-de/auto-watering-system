@@ -20,7 +20,7 @@
 
 // version number of the software
 #define SOFTWARE_VERSION_MAJOR 2
-#define SOFTWARE_VERSION_MINOR 2
+#define SOFTWARE_VERSION_MINOR 3
 #define SOFTWARE_VERSION_PATCH 0
 
 // version of the eeporm data model; must be increased if the data model changes
@@ -73,7 +73,10 @@ extern volatile bool channelOn[4];
 extern uint16_t adcValues[4];
 extern float temperature;
 extern float humidity;
-extern uint16_t batteryRaw;
+
+#if BAT_ENABLED == 1
+  extern uint16_t batteryRaw;
+#endif
 
 extern bool tempSwitchOn;
 extern float tempSwitchTriggerValueHigh;

@@ -21,7 +21,11 @@ volatile bool channelOn[4];
 uint16_t adcValues[4] = {0, 0, 0, 0};
 float temperature = -99;
 float humidity = -99;
-uint16_t batteryRaw;
+
+#if BAT_ENABLED == 1
+  uint16_t batteryRaw;
+#endif
+
 bool tempSwitchOn = false;
 float tempSwitchTriggerValueHigh = 32;
 float tempSwitchTriggerValueLow = 28;

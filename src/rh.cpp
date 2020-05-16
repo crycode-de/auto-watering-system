@@ -197,7 +197,9 @@ void rhRecv () {
             // poll with data
             switch (rhBufRx[1]) {
               case RH_MSG_BATTERY:
-                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+                #if BAT_ENABLED == 1
+                  rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+                #endif
                 break;
               case RH_MSG_CHANNEL_STATE:
                 rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
@@ -210,14 +212,18 @@ void rhRecv () {
                 break;
               default:
                 // no known poll request... send all
-                rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+                #if BAT_ENABLED == 1
+                  rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+                #endif
                 rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
                 rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
                 rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND, rhRxFrom);
             }
           } else {
             // poll without data... send all
-            rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+            #if BAT_ENABLED == 1
+              rhSendData(RH_MSG_BATTERY, RH_FORCE_SEND, rhRxFrom);
+            #endif
             rhSendData(RH_MSG_CHANNEL_STATE, RH_FORCE_SEND, rhRxFrom);
             rhSendData(RH_MSG_TEMP_SENSOR_DATA, RH_FORCE_SEND, rhRxFrom);
             rhSendData(RH_MSG_SENSOR_VALUES, RH_FORCE_SEND, rhRxFrom);
@@ -324,18 +330,23 @@ bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint16_t delayA
       break;
 
     case RH_MSG_BATTERY:
-      // calc battery percent value
-      if (batteryRaw <= BAT_ADC_LOW) {
-        rhBufTx[1] = 0;
-      } else if (batteryRaw >= BAT_ADC_FULL) {
-        rhBufTx[1] = 100;
-      } else {
-        rhBufTx[1] = 100 * (batteryRaw - BAT_ADC_LOW) / (BAT_ADC_FULL - BAT_ADC_LOW);
-      }
+      #if BAT_ENABLED == 1
+        // calc battery percent value
+        if (batteryRaw <= BAT_ADC_LOW) {
+          rhBufTx[1] = 0;
+        } else if (batteryRaw >= BAT_ADC_FULL) {
+          rhBufTx[1] = 100;
+        } else {
+          rhBufTx[1] = 100 * (batteryRaw - BAT_ADC_LOW) / (BAT_ADC_FULL - BAT_ADC_LOW);
+        }
 
-      // store battery raw value into buffer
-      memcpy(&rhBufTx[2], &batteryRaw, 2);
-      len = 4;
+        // store battery raw value into buffer
+        memcpy(&rhBufTx[2], &batteryRaw, 2);
+        len = 4;
+      #else
+        // battey not enabled
+        return true;
+      #endif
       break;
 
     case RH_MSG_VERSION:

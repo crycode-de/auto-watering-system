@@ -1,3 +1,6 @@
+## v2.3.0 - 2020-05-16
+- Added config option to disable battery readings
+
 ## v2.2.0 - 2020-05-13
 - Added temperature-dependent switch to control a fan or heating
 
