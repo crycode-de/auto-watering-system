@@ -121,7 +121,7 @@ const translations = {
     wateringTimesInfo: 'Zeit in Sekunden pro Kanal, die beim Überschreiten des jeweiligen <em>ADC Treiggerwertes</em> bewässert wird.',
     seconds: 'Sekunden',
     milliseconds: 'Millisekunden',
-    ownAddress: 'Eigene adresse',
+    ownAddress: 'Eigene Adresse',
     ownAddressInfo: 'Dies ist die Adresse des Bewässerungssystems im RadioHead-Netzwerk.\nDie Adresse kann in Hexadezimal- oder Dezimalschreibweise angegeben werden.\nBeispiel: <code>0xDC</code> oder <code>220</code>',
     pushDataToAddress: 'Sende Daten an Adresse',
     pushDataToAddressInfo: 'Zieladresse für automatisch gesendete Daten.\nDie Adresse kann in Hexadezimal- oder Dezimalschreibweise angegeben werden.\nBeispiel: <code>0x01</code> oder <code>1</code>',

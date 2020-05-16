@@ -66,6 +66,7 @@ class Watering {
     this.softwareVersionControl = require('./package.json').version;
     this.logData = [];
     this.lastPingData = Buffer.alloc(4);
+    this.versionInterval = null;
 
     // bind own methods to 'this'
     this.apiCheckNow = this.apiCheckNow.bind(this);
@@ -211,6 +212,11 @@ class Watering {
       res.status(400);
       res.send('Not connected');
       return;
+    }
+
+    if (this.versionInterval !== null) {
+      clearInterval(this.versionInterval);
+      this.versionInterval = null;
     }
 
     this.rhs.close()
@@ -608,6 +614,7 @@ class Watering {
 
       case RH_MSG_VERSION:
         clearInterval(this.versionInterval);
+        this.versionInterval = null;
         this.softwareVersion = `v${msg.data[1]}.${msg.data[2]}.${msg.data[3]}`;
         this.log('got software version ' + this.softwareVersion);
         break;
