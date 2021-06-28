@@ -1,7 +1,7 @@
 /*
  * Automatic Watering System
  *
- * (c) 2018-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * (c) 2018-2021 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Settings and setting-handlers for the options which can be changed at runtime.
  */
