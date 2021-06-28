@@ -11,7 +11,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
-  #include <dht.h>
+  #include <DHTStable.h>
 #elif TEMP_SENSOR_TYPE == 1820
   #include <OneWire.h>
   #include <DallasTemperature.h>
@@ -38,7 +38,7 @@ const uint8_t sensorAdcPins[4] = { SENSOR_0_ADC, SENSOR_1_ADC, SENSOR_2_ADC, SEN
 
 // structure of the settings stored in the eeprom and loaded at runtime
 struct Settings {
-  bool channelEnabled[4];      // indecator if the channel is enabled or not
+  bool channelEnabled[4];      // indicator if the channel is enabled or not
   uint16_t adcTriggerValue[4]; // minimum adc value which will trigger the watering
   uint16_t wateringTime[4];    // watering time in seconds
   uint16_t checkInterval;      // adc check interval in seconds
@@ -85,7 +85,7 @@ extern float tempSwitchTriggerValueLow;
 extern bool pauseAutomatic;
 
 #if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
-  extern dht dhtSensor;
+  extern DHTStable dhtSensor;
 #elif TEMP_SENSOR_TYPE == 1820
   extern DallasTemperature ds1820;
 #endif

@@ -30,7 +30,7 @@ void setup () {
   pinMode(EEPROM_RESET_PIN, INPUT_PULLUP);
   pinMode(TEMP_SWITCH_PIN, OUTPUT);
 
-  // blink the LED to indecate starting
+  // blink the LED to indicate starting
   blinkCode(BLINK_LONG);
 
   // all channels are off while starting

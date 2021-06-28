@@ -11,8 +11,8 @@
  *
  * To use this code with the ArduinoIDE make sure you have installed the
  * following libraries in your ArduinoIDE:
- * - DallasTemperature@3.8.1 (https://platformio.org/lib/show/54/DallasTemperature/installation)
- * - DHTStable@0.2.4 (https://platformio.org/lib/show/1337/DHTStable/installation)
- * - PinChangeInterrupt@1.2.6 (https://platformio.org/lib/show/725/PinChangeInterrupt/installation)
- * - RadioHead@1.89 (https://platformio.org/lib/show/124/RadioHead/installation)
+ * - DallasTemperature@3.9.1 (https://platformio.org/lib/show/54/DallasTemperature/installation)
+ * - DHTStable@1.0.1 (https://platformio.org/lib/show/1337/DHTStable/installation)
+ * - PinChangeInterrupt@1.2.9 (https://platformio.org/lib/show/725/PinChangeInterrupt/installation)
+ * - RadioHead@1.113 (https://platformio.org/lib/show/124/RadioHead/installation)
  */

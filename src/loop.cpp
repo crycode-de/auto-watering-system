@@ -35,13 +35,15 @@ void loop () {
           int dhtResult = dhtSensor.read22(TEMP_SENSOR_PIN);
         #endif
 
+        // get the values
+        temperature = dhtSensor.getTemperature();
+        humidity = dhtSensor.getHumidity();
+
         // check the result and also if the values are plausible
         if (dhtResult == DHTLIB_OK
-          && dhtSensor.humidity >= 0 && dhtSensor.humidity <= 100
-          && dhtSensor.temperature >= -50 && dhtSensor.temperature <= 100) {
+          && humidity >= 0 && humidity <= 100
+          && temperature >= -50 && temperature <= 100) {
           // sensor read ok
-          temperature = dhtSensor.temperature;
-          humidity = dhtSensor.humidity;
           sensorReadOk = true;
         } else {
           temperature = -99;
@@ -158,7 +160,7 @@ void loop () {
         if (turnValveOn(chan)) {
           // calc the turn off time
           channelTurnOffTime[chan] = now + ((uint32_t)settings.wateringTime[chan] * 1000);
-          // reset the turn on indecator
+          // reset the turn on indicator
           channelTurnOn[chan] = false;
         }
       }

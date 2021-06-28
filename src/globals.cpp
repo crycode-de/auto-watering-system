@@ -33,7 +33,7 @@ float tempSwitchTriggerValueLow = 28;
 bool pauseAutomatic;
 
 #if TEMP_SENSOR_TYPE == 11 || TEMP_SENSOR_TYPE == 12 || TEMP_SENSOR_TYPE == 22
-  dht dhtSensor;
+  DHTStable dhtSensor;
 #elif TEMP_SENSOR_TYPE == 1820
   OneWire oneWire(TEMP_SENSOR_PIN);
   DallasTemperature ds1820(&oneWire);

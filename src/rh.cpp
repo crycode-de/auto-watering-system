@@ -58,22 +58,22 @@ void rhRecv () {
           // request to send the current settings
           rhBufTx[1] = 0;
           for (uint8_t chan = 0; chan < 4; chan++) {
-            // bit 0..3 indecate the enabled channels
+            // bit 0..3 indicate the enabled channels
             if (settings.channelEnabled[chan]) {
               rhBufTx[1] |= (1 << chan);
             }
             memcpy(&rhBufTx[2+chan*2], &settings.adcTriggerValue[chan], 2);
             memcpy(&rhBufTx[10+chan*2], &settings.wateringTime[chan], 2);
           }
-          // bit 7 indecate if sending the adc values is enabled
+          // bit 7 indicate if sending the adc values is enabled
           if (settings.sendAdcValuesThroughRH) {
             rhBufTx[1] |= (1 << 7);
           }
-          // bit 6 indecate if data push is enabled
+          // bit 6 indicate if data push is enabled
           if (settings.pushDataEnabled) {
             rhBufTx[1] |= (1 << 6);
           }
-          // bit 5 indecate if temperature switch is inverted
+          // bit 5 indicate if temperature switch is inverted
           if (settings.tempSwitchInverted) {
             rhBufTx[1] |= (1 << 5);
           }
@@ -344,7 +344,7 @@ bool rhSendData(uint8_t msgType, bool forceSend, uint8_t sendTo, uint16_t delayA
         memcpy(&rhBufTx[2], &batteryRaw, 2);
         len = 4;
       #else
-        // battey not enabled
+        // battery not enabled
         return true;
       #endif
       break;
