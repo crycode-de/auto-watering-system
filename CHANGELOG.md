@@ -1,7 +1,9 @@
-## v2.3.1 - 2021-06-26
+## v2.3.2 - 2021-06-26
 - Updated all libriaries and adapted related code
 - Fixed some spelling issues
 
+## v2.3.1 - 2021-06-21
+- Updated Control App
 ## v2.3.0 - 2020-05-16
 - Added config option to disable battery readings
 
